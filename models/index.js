@@ -73,6 +73,26 @@ db.GoodReceivingDetil = require("./transaction/goodReceivingDetil")(
     Sequelize
 );
 
+// Product Pricing
+db.BuyingPrice = require("./transaction/product_pricing/buyingPrice")(
+    sequelize,
+    Sequelize
+);
+db.BuyingPriceDetil = require("./transaction/product_pricing/buyingPriceDetil")(
+    sequelize,
+    Sequelize
+);
+
+db.SettingPrice = require("./transaction/product_pricing/settingPrice")(
+    sequelize,
+    Sequelize
+);
+db.SettingPriceDetil =
+    require("./transaction/product_pricing/settingPriceDetil")(
+        sequelize,
+        Sequelize
+    );
+
 // Define associations
 Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {

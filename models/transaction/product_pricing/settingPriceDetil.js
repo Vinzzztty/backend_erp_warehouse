@@ -25,8 +25,12 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             SKUCode: {
-                type: DataTypes.STRING(255), // Autofill from BP Code
-                allowNull: true,
+                type: DataTypes.STRING(255), // Match Product.SKUCode
+                references: {
+                    model: "Product", // Ensure this matches the table name
+                    key: "SKUCode", // Match the referenced column name
+                },
+                allowNull: false,
             },
             SKUCodeChild: {
                 type: DataTypes.STRING(255), // Autofill from BP Code
