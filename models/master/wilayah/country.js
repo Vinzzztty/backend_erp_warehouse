@@ -5,22 +5,24 @@ module.exports = (sequelize, DataTypes) => {
             Code: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
-                autoIncrement: true, // Autogenerate the code
+                autoIncrement: true,
                 allowNull: false,
             },
             Name: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.STRING(255),
                 allowNull: false,
             },
             Status: {
-                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
+                type: DataTypes.ENUM("Active", "Non-Active"),
                 allowNull: false,
                 defaultValue: "Active",
             },
         },
         {
+            tableName: "Country", // Ensure tableName matches
             timestamps: true,
         }
     );
+
     return Country;
 };

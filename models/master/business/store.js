@@ -3,28 +3,29 @@ module.exports = (sequelize, DataTypes) => {
         "Store",
         {
             Code: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.STRING(10),
                 primaryKey: true,
-                autoIncrement: true, // Autogenerate and increment code
                 allowNull: false,
             },
             Name: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.STRING(100),
                 allowNull: false,
             },
             Notes: {
-                type: DataTypes.TEXT, // Free text input (textarea)
+                type: DataTypes.TEXT,
                 allowNull: true,
             },
             Status: {
-                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-Active
+                type: DataTypes.ENUM("Active", "Non-Active"),
                 allowNull: false,
-                defaultValue: "Active", // Default status for new entries
+                defaultValue: "Active",
             },
         },
         {
-            timestamps: true, // Automatically adds createdAt and updatedAt fields
-            tableName: "Store", // Explicit table name
+            timestamps: true,
+            tableName: "Store",
+            charset: "utf8mb4", // Ensure consistent charset
+            collate: "utf8mb4_general_ci", // Ensure consistent collation
         }
     );
 

@@ -3,26 +3,26 @@ module.exports = (sequelize, DataTypes) => {
         "UoM",
         {
             Code: {
-                type: DataTypes.STRING(10), // Free text input
+                type: DataTypes.STRING(10), // Ensure this matches the Product model
                 primaryKey: true,
                 allowNull: false,
             },
             Name: {
-                type: DataTypes.STRING(100), // Free text input
+                type: DataTypes.STRING(100),
                 allowNull: false,
             },
             Notes: {
-                type: DataTypes.TEXT, // Free text input (textarea)
+                type: DataTypes.TEXT,
                 allowNull: true,
             },
             Status: {
-                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
+                type: DataTypes.ENUM("Active", "Non-Active"),
                 allowNull: false,
-                defaultValue: "Active", // Default value for new entries
+                defaultValue: "Active",
             },
         },
         {
-            timestamps: true, // Automatically adds createdAt and updatedAt fields
+            timestamps: true,
             tableName: "UoM", // Explicit table name
         }
     );
