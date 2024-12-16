@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiCxQuotation = sequelize.define(
-        "TransaksiCxQuotation",
+    const BuyingPrice = sequelize.define(
+        "BuyingPrice",
         {
             Code: {
                 type: DataTypes.INTEGER, // Autogenerate, counting
@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DATEONLY, // Date picker/Calendar
                 allowNull: false,
             },
-            ForwarderId: {
-                type: DataTypes.INTEGER, // Foreign key to M.Forwarder
+            WarehouseId: {
+                type: DataTypes.INTEGER, // Foreign key to M.Warehouse
                 references: {
-                    model: "Forwarder",
+                    model: "Warehouse",
                     key: "Code",
                 },
                 allowNull: false,
@@ -27,16 +27,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiCxQuotation",
+            tableName: "BuyingPrice",
         }
     );
 
-    TransaksiCxQuotation.associate = (models) => {
-        TransaksiCxQuotation.belongsTo(models.Forwarder, {
-            foreignKey: "ForwarderId",
-            as: "Forwarder",
+    BuyingPrice.associate = (models) => {
+        BuyingPrice.belongsTo(models.Warehouse, {
+            foreignKey: "WarehouseId",
+            as: "Warehouse",
         });
     };
 
-    return TransaksiCxQuotation;
+    return BuyingPrice;
 };

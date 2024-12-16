@@ -34,6 +34,12 @@ db.Product = require("./master/product/product")(sequelize, Sequelize);
 db.UoM = require("./master/product/uom")(sequelize, Sequelize);
 db.Variant = require("./master/product/variant")(sequelize, Sequelize);
 
+// Transaction
+db.PurchaseOrder = require("./transaction/purchaseOrder")(sequelize, Sequelize);
+db.PurchaseOrderDetil = require("./transaction/purchaseOrderDetil")(
+    sequelize,
+    Sequelize
+);
 
 // Define associations
 Object.keys(db).forEach((modelName) => {
