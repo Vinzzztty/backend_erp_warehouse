@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiCxQuotation = sequelize.define(
-        "TransaksiCxQuotation",
+    const CxQuotation = sequelize.define(
+        "CxQuotation",
         {
             Code: {
                 type: DataTypes.INTEGER, // Autogenerate, counting
@@ -27,16 +27,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiCxQuotation",
+            tableName: "CxQuotation",
         }
     );
 
-    TransaksiCxQuotation.associate = (models) => {
-        TransaksiCxQuotation.belongsTo(models.Forwarder, {
+    CxQuotation.associate = (models) => {
+        CxQuotation.belongsTo(models.Forwarder, {
             foreignKey: "ForwarderId",
             as: "Forwarder",
         });
     };
 
-    return TransaksiCxQuotation;
+    return CxQuotation;
 };

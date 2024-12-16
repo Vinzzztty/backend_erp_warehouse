@@ -9,15 +9,20 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             Name: {
-                type: DataTypes.STRING(100),
+                type: DataTypes.STRING(100), // Free text input
                 allowNull: false,
             },
             CodeName: {
-                type: DataTypes.STRING(100),
+                type: DataTypes.STRING(100), // Free text input, auto uppercase
                 allowNull: true,
                 set(value) {
                     this.setDataValue("CodeName", value.toUpperCase());
                 },
+            },
+            SKUCode: {
+                type: DataTypes.STRING(255), // Ensure the data type matches the reference
+                unique: true, // Add a unique constraint
+                allowNull: true,
             },
             SKUFull: {
                 type: DataTypes.STRING(255),
@@ -27,20 +32,16 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
-            SKUCode: {
-                type: DataTypes.STRING(255),
-                allowNull: true,
-            },
             SKUCodeChild: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
             CompanyCode: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Foreign key from m.company
                 allowNull: false,
             },
             CategoryCode: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Foreign key from m.category
                 references: {
                     model: "Category",
                     key: "Code",
@@ -48,15 +49,19 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             VariantId: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Foreign key from m.variant
                 references: {
                     model: "Variant",
                     key: "Code",
                 },
                 allowNull: true,
             },
+            Content: {
+                type: DataTypes.TEXT, // Free text input
+                allowNull: true,
+            },
             UoM: {
-                type: DataTypes.STRING(10), // Match UoM.Code
+                type: DataTypes.STRING(10), // Foreign key from m.uom
                 references: {
                     model: "UoM",
                     key: "Code",
@@ -64,49 +69,48 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             Notes: {
-                type: DataTypes.TEXT,
+                type: DataTypes.TEXT, // Free text input (textarea)
                 allowNull: true,
             },
             Status: {
-                type: DataTypes.ENUM("Active", "Non-Active"),
+                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
                 allowNull: false,
-                defaultValue: "Active",
+                defaultValue: "Active", // Default value
             },
             Length: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Read-only detail
                 allowNull: true,
             },
             Width: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Read-only detail
                 allowNull: true,
             },
             Height: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Read-only detail
                 allowNull: true,
             },
             Weight: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Read-only detail
                 allowNull: true,
             },
             Parameter: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Integer input
                 allowNull: true,
             },
             Keyword: {
-                type: DataTypes.STRING(255),
+                type: DataTypes.STRING(255), // Free text input
                 allowNull: true,
             },
             StoreName: {
-                type: DataTypes.INTEGER, // Match Store.Code as integer
+                type: DataTypes.INTEGER, // Foreign key from m.store
                 references: {
-                    model: "Store", // Reference the Store table
+                    model: "Store",
                     key: "Code",
                 },
                 allowNull: true,
             },
-
             Channel: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Foreign key from m.channel
                 references: {
                     model: "Channel",
                     key: "Code",
@@ -114,25 +118,31 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             InitialChannel: {
-                type: DataTypes.STRING(100),
+                type: DataTypes.STRING(100), // Autofill from Channel
                 allowNull: true,
             },
             CategoryFromChannel: {
-                type: DataTypes.STRING(100),
+                type: DataTypes.STRING(100), // Autofill from Channel
                 allowNull: true,
             },
             CodeNumber: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.INTEGER, // Integer input
                 allowNull: true,
             },
             SKUCodeEcommerce: {
-                type: DataTypes.STRING(255),
+                type: DataTypes.STRING(255), // Autogenerate based on formula
                 allowNull: true,
             },
         },
         {
             timestamps: true,
             tableName: "Product",
+            indexes: [
+                {
+                    unique: true, // Ensure this creates a unique index
+                    fields: ["SKUCode"],
+                },
+            ],
         }
     );
 

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiLastMileDetails = sequelize.define(
-        "TransaksiLastMileDetails",
+    const LastMileDetails = sequelize.define(
+        "LastMileDetails",
         {
             Id: {
                 type: DataTypes.INTEGER,
@@ -9,9 +9,9 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             TransaksiLastMileId: {
-                type: DataTypes.INTEGER, // Foreign key to TransaksiLastMile
+                type: DataTypes.INTEGER, // Foreign key to LastMile
                 references: {
-                    model: "TransaksiLastMile",
+                    model: "LastMile",
                     key: "Code",
                 },
                 allowNull: false,
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
             CXCode: {
                 type: DataTypes.INTEGER, // Browse from approved CX Invoice with status Paid
                 references: {
-                    model: "TransaksiCxInvoice",
+                    model: "CxInvoice",
                     key: "Code",
                 },
                 allowNull: false,
@@ -67,12 +67,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiLastMileDetails",
+            tableName: "LastMileDetails",
         }
     );
 
     // Hooks for auto-calculations
-    TransaksiLastMileDetails.addHook("beforeSave", (details) => {
+    LastMileDetails.addHook("beforeSave", (details) => {
         // Auto-calculate Subtotal
         details.Subtotal = (
             parseFloat(details.ShippingCost || 0) +
@@ -83,20 +83,20 @@ module.exports = (sequelize, DataTypes) => {
         details.Total = details.Subtotal; // Add additional logic if required
     });
 
-    TransaksiLastMileDetails.associate = (models) => {
-        TransaksiLastMileDetails.belongsTo(models.TransaksiLastMile, {
-            foreignKey: "TransaksiLastMileId",
-            as: "TransaksiLastMile",
+    LastMileDetails.associate = (models) => {
+        LastMileDetails.belongsTo(models.LastMile, {
+            foreignKey: "LastMileId",
+            as: "LastMile",
         });
-        TransaksiLastMileDetails.belongsTo(models.TransaksiCxInvoice, {
+        LastMileDetails.belongsTo(models.CxInvoice, {
             foreignKey: "CXCode",
             as: "CxInvoice",
         });
-        TransaksiLastMileDetails.belongsTo(models.Warehouse, {
+        LastMileDetails.belongsTo(models.Warehouse, {
             foreignKey: "WarehouseCode",
             as: "Warehouse",
         });
     };
 
-    return TransaksiLastMileDetails;
+    return LastMileDetails;
 };

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiLastMile = sequelize.define(
-        "TransaksiLastMile",
+    const LastMile = sequelize.define(
+        "LastMile",
         {
             Code: {
                 type: DataTypes.INTEGER, // Autogenerate, counting
@@ -27,16 +27,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiLastMile",
+            tableName: "LastMile",
         }
     );
 
-    TransaksiLastMile.associate = (models) => {
-        TransaksiLastMile.belongsTo(models.Forwarder, {
+    LastMile.associate = (models) => {
+        LastMile.belongsTo(models.Forwarder, {
             foreignKey: "ForwarderId",
             as: "Forwarder",
         });
     };
 
-    return TransaksiLastMile;
+    return LastMile;
 };

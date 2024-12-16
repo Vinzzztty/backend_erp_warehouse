@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const Store = sequelize.define(
-        "Store",
+    const Supplier = sequelize.define(
+        "Supplier",
         {
             Code: {
                 type: DataTypes.INTEGER,
@@ -92,29 +92,29 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true, // Automatically adds createdAt and updatedAt fields
-            tableName: "Store", // Explicit table name
+            tableName: "Supplier", // Explicit table name
         }
     );
 
     // Define associations
-    Store.associate = (models) => {
-        Store.belongsTo(models.City, {
+    Supplier.associate = (models) => {
+        Supplier.belongsTo(models.City, {
             foreignKey: "CityId",
             as: "City",
         });
-        Store.belongsTo(models.Province, {
+        Supplier.belongsTo(models.Province, {
             foreignKey: "ProvinceId",
             as: "Province",
         });
-        Store.belongsTo(models.Country, {
+        Supplier.belongsTo(models.Country, {
             foreignKey: "CountryId",
             as: "Country",
         });
-        Store.belongsTo(models.Bank, {
+        Supplier.belongsTo(models.Bank, {
             foreignKey: "BankId",
             as: "Bank",
         });
     };
 
-    return Store;
+    return Supplier;
 };

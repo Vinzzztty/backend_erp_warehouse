@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiCxInvoiceDetails = sequelize.define(
-        "TransaksiCxInvoiceDetails",
+    const CxInvoiceDetails = sequelize.define(
+        "CxInvoiceDetails",
         {
             Id: {
                 type: DataTypes.INTEGER,
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             TransaksiCxInvoiceId: {
                 type: DataTypes.INTEGER, // Foreign key to TransaksiCxInvoice
                 references: {
-                    model: "TransaksiCxInvoice",
+                    model: "CxInvoice",
                     key: "Code",
                 },
                 allowNull: false,
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
             CXCode: {
                 type: DataTypes.INTEGER, // Browse outstanding CX Quot from Forwarder
                 references: {
-                    model: "TransaksiCxQuotation",
+                    model: "CxQuotation",
                     key: "Code",
                 },
                 allowNull: false,
@@ -75,12 +75,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiCxInvoiceDetails",
+            tableName: "CxInvoiceDetails",
         }
     );
 
     // Hooks for auto-calculations
-    TransaksiCxInvoiceDetails.addHook("beforeSave", (details) => {
+    CxInvoiceDetails.addHook("beforeSave", (details) => {
         // Auto-calculate CXCostRMB
         if (details.Rate && details.CXCostRupiah) {
             details.CXCostRMB = (details.CXCostRupiah / details.Rate).toFixed(
@@ -116,16 +116,16 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
 
-    TransaksiCxInvoiceDetails.associate = (models) => {
-        TransaksiCxInvoiceDetails.belongsTo(models.TransaksiCxInvoice, {
+    CxInvoiceDetails.associate = (models) => {
+        CxInvoiceDetails.belongsTo(models.CxInvoice, {
             foreignKey: "TransaksiCxInvoiceId",
             as: "TransaksiCxInvoice",
         });
-        TransaksiCxInvoiceDetails.belongsTo(models.TransaksiCxQuotation, {
+        CxInvoiceDetails.belongsTo(models.CxQuotation, {
             foreignKey: "CXCode",
             as: "CxQuotation",
         });
     };
 
-    return TransaksiCxInvoiceDetails;
+    return CxInvoiceDetails;
 };

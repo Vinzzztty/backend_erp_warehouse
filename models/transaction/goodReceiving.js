@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiGoodsReceiving = sequelize.define(
-        "TransaksiGoodsReceiving",
+    const GoodReceiving = sequelize.define(
+        "GoodReceiving",
         {
             Code: {
                 type: DataTypes.INTEGER, // Autogenerate, counting
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
             LMCode: {
                 type: DataTypes.INTEGER, // Foreign key to T.LMilePay (Paid status)
                 references: {
-                    model: "TransaksiLastMile",
+                    model: "LastMile",
                     key: "Code",
                 },
                 allowNull: false,
@@ -43,24 +43,24 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiGoodsReceiving",
+            tableName: "GoodReceiving",
         }
     );
 
-    TransaksiGoodsReceiving.associate = (models) => {
-        TransaksiGoodsReceiving.belongsTo(models.Forwarder, {
+    GoodReceiving.associate = (models) => {
+        GoodReceiving.belongsTo(models.Forwarder, {
             foreignKey: "ForwarderId",
             as: "Forwarder",
         });
-        TransaksiGoodsReceiving.belongsTo(models.TransaksiLastMile, {
+        GoodReceiving.belongsTo(models.LastMile, {
             foreignKey: "LMCode",
             as: "LastMile",
         });
-        TransaksiGoodsReceiving.belongsTo(models.Warehouse, {
+        GoodReceiving.belongsTo(models.Warehouse, {
             foreignKey: "WarehouseId",
             as: "Warehouse",
         });
     };
 
-    return TransaksiGoodsReceiving;
+    return GoodReceiving;
 };

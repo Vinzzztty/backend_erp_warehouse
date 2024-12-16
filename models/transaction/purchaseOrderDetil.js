@@ -17,10 +17,10 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             SKUCode: {
-                type: DataTypes.STRING(255), // Foreign key to M.Product
+                type: DataTypes.STRING(255), // Match the data type in Product
                 references: {
                     model: "Product",
-                    key: "SKUCode",
+                    key: "SKUCode", // Ensure this matches the indexed column in Product
                 },
                 allowNull: false,
             },

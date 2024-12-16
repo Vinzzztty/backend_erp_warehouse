@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiGoodsReceivingDetails = sequelize.define(
-        "TransaksiGoodsReceivingDetails",
+    const GoodReceivingDetails = sequelize.define(
+        "GoodReceivingDetails",
         {
             Id: {
                 type: DataTypes.INTEGER,
@@ -8,10 +8,10 @@ module.exports = (sequelize, DataTypes) => {
                 autoIncrement: true,
                 allowNull: false,
             },
-            TransaksiGoodsReceivingId: {
-                type: DataTypes.INTEGER, // Foreign key to TransaksiGoodsReceiving
+            GoodsReceivingId: {
+                type: DataTypes.INTEGER, // Foreign key to GoodsReceiving
                 references: {
-                    model: "TransaksiGoodsReceiving",
+                    model: "GoodReceiving",
                     key: "Code",
                 },
                 allowNull: false,
@@ -63,12 +63,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiGoodsReceivingDetails",
+            tableName: "GoodReceivingDetails",
         }
     );
 
     // Hooks for auto-calculations
-    TransaksiGoodsReceivingDetails.addHook("beforeSave", (details) => {
+    GoodReceivingDetails.addHook("beforeSave", (details) => {
         // Auto-calculate RemainQty
         if (details.OrderedQty && details.ReceivedQty) {
             details.RemainQty = (
@@ -77,15 +77,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
 
-    TransaksiGoodsReceivingDetails.associate = (models) => {
-        TransaksiGoodsReceivingDetails.belongsTo(
-            models.TransaksiGoodsReceiving,
-            {
-                foreignKey: "TransaksiGoodsReceivingId",
-                as: "GoodsReceiving",
-            }
-        );
+    GoodReceivingDetails.associate = (models) => {
+        GoodReceivingDetails.belongsTo(models.GoodReceiving, {
+            foreignKey: "GoodReceivingId",
+            as: "GoodReceiving",
+        });
     };
 
-    return TransaksiGoodsReceivingDetails;
+    return GoodReceivingDetails;
 };

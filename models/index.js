@@ -17,7 +17,7 @@ db.City = require("./master/wilayah/city")(sequelize, Sequelize);
 // Master Business
 db.User = require("./user")(sequelize, Sequelize);
 db.Company = require("./master/business/company")(sequelize, Sequelize);
-db.Forward = require("./master/business/forwarder")(sequelize, Sequelize);
+db.Forwarder = require("./master/business/forwarder")(sequelize, Sequelize);
 db.Store = require("./master/business/store")(sequelize, Sequelize);
 db.Supplier = require("./master/business/supplier")(sequelize, Sequelize);
 
@@ -40,6 +40,38 @@ db.PurchaseOrderDetil = require("./transaction/purchaseOrderDetil")(
     sequelize,
     Sequelize
 );
+db.ProformaInvoice = require("./transaction/piInvoice")(sequelize, Sequelize);
+db.ProformaInvoiceDetil = require("./transaction/piInvoiceDetil")(
+    sequelize,
+    Sequelize
+);
+
+db.PiPayment = require("./transaction/piPayment")(sequelize, Sequelize);
+db.PiPaymentDetil = require("./transaction/piPaymentDetil")(
+    sequelize,
+    Sequelize
+);
+
+db.CxQuotation = require("./transaction/cxQuotation")(sequelize, Sequelize);
+db.CxQuotationDetil = require("./transaction/cxQuotationDetil")(
+    sequelize,
+    Sequelize
+);
+
+db.CxInvoice = require("./transaction/cxInvoice")(sequelize, Sequelize);
+db.CxInvoiceDetil = require("./transaction/cxInvoiceDetil")(
+    sequelize,
+    Sequelize
+);
+
+db.LastMile = require("./transaction/lastMile")(sequelize, Sequelize);
+db.LastMileDetil = require("./transaction/lastMileDetil")(sequelize, Sequelize);
+
+db.GoodReceiving = require("./transaction/goodReceiving")(sequelize, Sequelize);
+db.GoodReceivingDetil = require("./transaction/goodReceivingDetil")(
+    sequelize,
+    Sequelize
+);
 
 // Define associations
 Object.keys(db).forEach((modelName) => {
@@ -47,5 +79,7 @@ Object.keys(db).forEach((modelName) => {
         db[modelName].associate(db);
     }
 });
+
+console.log(Object.keys(db)); // Should include TransaksiCxQuotation, TransaksiCxQuotationDetails, and ProformaInvoice
 
 module.exports = db;

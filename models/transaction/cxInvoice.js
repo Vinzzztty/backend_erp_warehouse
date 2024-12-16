@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiCxInvoice = sequelize.define(
-        "TransaksiCxInvoice",
+    const CxInvoice = sequelize.define(
+        "CxInvoice",
         {
             Code: {
                 type: DataTypes.INTEGER, // Autogenerate, counting
@@ -40,16 +40,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiCxInvoice",
+            tableName: "CxInvoice",
         }
     );
 
-    TransaksiCxInvoice.associate = (models) => {
-        TransaksiCxInvoice.belongsTo(models.Forwarder, {
+    CxInvoice.associate = (models) => {
+        CxInvoice.belongsTo(models.Forwarder, {
             foreignKey: "ForwarderId",
             as: "Forwarder",
         });
     };
 
-    return TransaksiCxInvoice;
+    return CxInvoice;
 };

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const TransaksiCxQuotationDetails = sequelize.define(
-        "TransaksiCxQuotationDetails",
+    const CxQuotationDetails = sequelize.define(
+        "CxQuotationDetails",
         {
             Id: {
                 type: DataTypes.INTEGER,
@@ -8,16 +8,16 @@ module.exports = (sequelize, DataTypes) => {
                 autoIncrement: true,
                 allowNull: false,
             },
-            TransaksiCxQuotationId: {
-                type: DataTypes.INTEGER, // Foreign key to TransaksiCxQuotation
+            CxQuotationId: {
+                type: DataTypes.INTEGER, // Foreign key to CxQuotation
                 references: {
-                    model: "TransaksiCxQuotation",
+                    model: "CxQuotation",
                     key: "Code",
                 },
                 allowNull: false,
             },
             PICode: {
-                type: DataTypes.INTEGER, // Browse from approved and Paid PI
+                type: DataTypes.INTEGER,
                 references: {
                     model: "ProformaInvoice",
                     key: "Code",
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             ProductName: {
-                type: DataTypes.STRING(255), // Browse from PI
+                type: DataTypes.STRING(255),
                 allowNull: false,
             },
             Variant: {
@@ -99,11 +99,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "TransaksiCxQuotationDetails",
+            tableName: "CxQuotationDetails",
         }
     );
 
-    TransaksiCxQuotationDetails.addHook("beforeSave", (details) => {
+    CxQuotationDetails.addHook("beforeSave", (details) => {
         // Auto-calculate EstimatedCBMTotal
         if (
             details.CartonP &&
@@ -129,16 +129,16 @@ module.exports = (sequelize, DataTypes) => {
         ).toFixed(2);
     });
 
-    TransaksiCxQuotationDetails.associate = (models) => {
-        TransaksiCxQuotationDetails.belongsTo(models.TransaksiCxQuotation, {
-            foreignKey: "TransaksiCxQuotationId",
-            as: "TransaksiCxQuotation",
+    CxQuotationDetails.associate = (models) => {
+        CxQuotationDetails.belongsTo(models.CxQuotation, {
+            foreignKey: "CxQuotationId",
+            as: "CxQuotation",
         });
-        TransaksiCxQuotationDetails.belongsTo(models.ProformaInvoice, {
+        CxQuotationDetails.belongsTo(models.ProformaInvoice, {
             foreignKey: "PICode",
             as: "ProformaInvoice",
         });
     };
 
-    return TransaksiCxQuotationDetails;
+    return CxQuotationDetails;
 };
