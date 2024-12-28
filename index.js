@@ -11,7 +11,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/v1/auth", require("./routes/authRoutes"));
+app.use("/api/v1/auth", require("./routes/auth/authRoutes"));
+app.use("/api/v1/master", require("./routes/master/companyRoutes"));
+app.use("/api/v1/master", require("./routes/master/bankRoutes"));
+app.use("/api/v1/master", require("./routes/master/costRoutes"));
+app.use("/api/v1/master", require("./routes/master/currencyRoute"));
+app.use("/api/v1/master", require("./routes/master/ppnSettingRoutes"));
 
 app.get("/", (req, res) => {
     res.send("Welcome to API");

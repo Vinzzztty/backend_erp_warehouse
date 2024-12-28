@@ -25,7 +25,7 @@ db.Supplier = require("./master/business/supplier")(sequelize, Sequelize);
 db.Cost = require("./master/finance/cost")(sequelize, Sequelize);
 db.Bank = require("./master/finance/bank")(sequelize, Sequelize);
 db.Currency = require("./master/finance/currency")(sequelize, Sequelize);
-db.PPN = require("./master/finance/ppn")(sequelize, Sequelize);
+db.PPNSetting = require("./master/finance/ppn")(sequelize, Sequelize);
 
 // Master Product
 db.Category = require("./master/product/category")(sequelize, Sequelize);
