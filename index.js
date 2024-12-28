@@ -18,6 +18,9 @@ app.use("/api/v1/master", require("./routes/master/costRoutes"));
 app.use("/api/v1/master", require("./routes/master/currencyRoute"));
 app.use("/api/v1/master", require("./routes/master/ppnSettingRoutes"));
 app.use("/api/v1/master", require("./routes/master/warehouseRoutes"));
+app.use("/api/v1/master", require("./routes/master/countryRoutes"));
+app.use("/api/v1/master", require("./routes/master/provinceRoutes"));
+app.use("/api/v1/master", require("./routes/master/cityRoutes"));
 
 app.get("/", (req, res) => {
     res.send("Welcome to API");
