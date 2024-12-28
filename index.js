@@ -21,6 +21,9 @@ app.use("/api/v1/master", require("./routes/master/warehouseRoutes"));
 app.use("/api/v1/master", require("./routes/master/countryRoutes"));
 app.use("/api/v1/master", require("./routes/master/provinceRoutes"));
 app.use("/api/v1/master", require("./routes/master/cityRoutes"));
+app.use("/api/v1/master", require("./routes/master/forwarderRoutes"));
+app.use("/api/v1/master", require("./routes/master/storeRoutes"));
+app.use("/api/v1/master", require("./routes/master/supplierRoutes"));
 
 app.get("/", (req, res) => {
     res.send("Welcome to API");
