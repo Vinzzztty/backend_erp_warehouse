@@ -72,6 +72,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT, // Free text input (textarea)
                 allowNull: true,
             },
+            ImageURL: {
+                type: DataTypes.STRING(255), // or TEXT if you need longer URLs
+                allowNull: true,
+            },
+
             Status: {
                 type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
                 allowNull: false,

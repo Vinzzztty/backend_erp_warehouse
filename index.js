@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/v1/auth", require("./routes/auth/authRoutes"));
@@ -24,6 +25,11 @@ app.use("/api/v1/master", require("./routes/master/cityRoutes"));
 app.use("/api/v1/master", require("./routes/master/forwarderRoutes"));
 app.use("/api/v1/master", require("./routes/master/storeRoutes"));
 app.use("/api/v1/master", require("./routes/master/supplierRoutes"));
+app.use("/api/v1/master", require("./routes/master/categoryRoutes"));
+app.use("/api/v1/master", require("./routes/master/channelRotues"));
+app.use("/api/v1/master", require("./routes/master/uomRoutes"));
+app.use("/api/v1/master", require("./routes/master/variantRoutes"));
+app.use("/api/v1/master", require("./routes/master/productRoutes"));
 
 app.get("/", (req, res) => {
     res.send("Welcome to API");
