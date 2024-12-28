@@ -17,6 +17,7 @@ app.use("/api/v1/master", require("./routes/master/bankRoutes"));
 app.use("/api/v1/master", require("./routes/master/costRoutes"));
 app.use("/api/v1/master", require("./routes/master/currencyRoute"));
 app.use("/api/v1/master", require("./routes/master/ppnSettingRoutes"));
+app.use("/api/v1/master", require("./routes/master/warehouseRoutes"));
 
 app.get("/", (req, res) => {
     res.send("Welcome to API");
