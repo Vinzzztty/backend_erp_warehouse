@@ -9,11 +9,18 @@ const PORT = process.env.PORT || 3001;
 // Configure CORS
 app.use(
     cors({
-        origin: "https://fe-erp-warehouse.vercel.app", // Replace with your frontend URL
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         methods: "GET,POST,PUT,DELETE",
         credentials: true,
     })
 );
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
