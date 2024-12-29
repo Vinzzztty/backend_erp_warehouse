@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const GoodReceiving = sequelize.define(
-        "GoodReceiving",
+    const GoodsReceipt = sequelize.define(
+        "GoodsReceipt",
         {
             Code: {
                 type: DataTypes.INTEGER, // Autogenerate, counting
@@ -43,24 +43,24 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "GoodReceiving",
+            tableName: "GoodsReceipt",
         }
     );
 
-    GoodReceiving.associate = (models) => {
-        GoodReceiving.belongsTo(models.Forwarder, {
+    GoodsReceipt.associate = (models) => {
+        GoodsReceipt.belongsTo(models.Forwarder, {
             foreignKey: "ForwarderId",
             as: "Forwarder",
         });
-        GoodReceiving.belongsTo(models.LastMile, {
+        GoodsReceipt.belongsTo(models.LastMile, {
             foreignKey: "LMCode",
             as: "LastMile",
         });
-        GoodReceiving.belongsTo(models.Warehouse, {
+        GoodsReceipt.belongsTo(models.Warehouse, {
             foreignKey: "WarehouseId",
             as: "Warehouse",
         });
     };
 
-    return GoodReceiving;
+    return GoodsReceipt;
 };

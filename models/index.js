@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const sequelize = require("../config/db");
+const sequelize = require("../config/db_local");
 
 const db = {};
 
@@ -67,8 +67,8 @@ db.CxInvoiceDetil = require("./transaction/cxInvoiceDetil")(
 db.LastMile = require("./transaction/lastMile")(sequelize, Sequelize);
 db.LastMileDetil = require("./transaction/lastMileDetil")(sequelize, Sequelize);
 
-db.GoodReceiving = require("./transaction/goodReceiving")(sequelize, Sequelize);
-db.GoodReceivingDetil = require("./transaction/goodReceivingDetil")(
+db.GoodsReceipt = require("./transaction/goodsReceipt")(sequelize, Sequelize);
+db.GoodsReceiptDetil = require("./transaction/goodsReceiptDetil")(
     sequelize,
     Sequelize
 );

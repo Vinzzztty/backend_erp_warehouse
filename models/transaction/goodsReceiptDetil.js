@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const GoodReceivingDetails = sequelize.define(
-        "GoodReceivingDetails",
+    const GoodsReceiptDetil = sequelize.define(
+        "GoodsReceiptDetil",
         {
             Id: {
                 type: DataTypes.INTEGER,
@@ -8,10 +8,10 @@ module.exports = (sequelize, DataTypes) => {
                 autoIncrement: true,
                 allowNull: false,
             },
-            GoodsReceivingId: {
+            GoodsReceiptId: {
                 type: DataTypes.INTEGER, // Foreign key to GoodsReceiving
                 references: {
-                    model: "GoodReceiving",
+                    model: "GoodsReceipt",
                     key: "Code",
                 },
                 allowNull: false,
@@ -63,12 +63,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "GoodReceivingDetails",
+            tableName: "GoodsReceiptDetil",
         }
     );
 
     // Hooks for auto-calculations
-    GoodReceivingDetails.addHook("beforeSave", (details) => {
+    GoodsReceiptDetil.addHook("beforeSave", (details) => {
         // Auto-calculate RemainQty
         if (details.OrderedQty && details.ReceivedQty) {
             details.RemainQty = (
@@ -77,12 +77,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
 
-    GoodReceivingDetails.associate = (models) => {
-        GoodReceivingDetails.belongsTo(models.GoodReceiving, {
-            foreignKey: "GoodReceivingId",
-            as: "GoodReceiving",
+    GoodsReceiptDetil.associate = (models) => {
+        GoodsReceiptDetil.belongsTo(models.GoodsReceipt, {
+            foreignKey: "GoodsReceiptId",
+            as: "GoodsReceipt",
         });
     };
 
-    return GoodReceivingDetails;
+    return GoodsReceiptDetil;
 };

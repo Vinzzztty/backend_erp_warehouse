@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const ProformaProductDetails = sequelize.define(
-        "ProformaProductDetails",
+    const ProformaInvoiceDetails = sequelize.define(
+        "ProformaInvoiceDetails",
         {
             Id: {
                 type: DataTypes.INTEGER,
@@ -103,12 +103,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             timestamps: true,
-            tableName: "ProformaProductDetails",
+            tableName: "ProformaInvoiceDetails",
         }
     );
 
     // Hooks for auto-filling fields
-    ProformaProductDetails.addHook("beforeSave", async (details, options) => {
+    ProformaInvoiceDetails.addHook("beforeSave", async (details, options) => {
         // Fetch product details if SKUCode is provided
         if (details.SKUCode) {
             const Product = await sequelize.models.Product.findOne({
@@ -152,17 +152,17 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     // Associations
-    ProformaProductDetails.associate = (models) => {
-        ProformaProductDetails.belongsTo(models.ProformaInvoice, {
+    ProformaInvoiceDetails.associate = (models) => {
+        ProformaInvoiceDetails.belongsTo(models.ProformaInvoice, {
             foreignKey: "ProformaInvoiceId",
             as: "ProformaInvoice",
         });
 
-        ProformaProductDetails.belongsTo(models.Product, {
+        ProformaInvoiceDetails.belongsTo(models.Product, {
             foreignKey: "SKUCode",
             as: "Product",
         });
     };
 
-    return ProformaProductDetails;
+    return ProformaInvoiceDetails;
 };

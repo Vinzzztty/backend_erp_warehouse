@@ -1,7 +1,7 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/db");
+const sequelize = require("./config/db_local");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,6 +13,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/v1/auth", require("./routes/auth/authRoutes"));
+
+// Master routes
 app.use("/api/v1/master", require("./routes/master/companyRoutes"));
 app.use("/api/v1/master", require("./routes/master/bankRoutes"));
 app.use("/api/v1/master", require("./routes/master/costRoutes"));
@@ -31,6 +33,43 @@ app.use("/api/v1/master", require("./routes/master/uomRoutes"));
 app.use("/api/v1/master", require("./routes/master/variantRoutes"));
 app.use("/api/v1/master", require("./routes/master/productRoutes"));
 
+// Transaction Routes
+app.use(
+    "/api/v1/transaction",
+    require("./routes/transaction/purchaseOrderRoutes")
+);
+app.use(
+    "/api/v1/transaction",
+    require("./routes/transaction/purchaseOrderDetilRoutes")
+);
+app.use("/api/v1/transaction", require("./routes/transaction/piRoutes"));
+app.use("/api/v1/transaction", require("./routes/transaction/piDetilRoutes"));
+app.use("/api/v1/transaction", require("./routes/transaction/piPaymentRoutes"));
+app.use(
+    "/api/v1/transaction",
+    require("./routes/transaction/piPaymentDetilRoutes")
+);
+app.use(
+    "/api/v1/transaction",
+    require("./routes/transaction/cxQuotationRoutes")
+);
+app.use(
+    "/api/v1/transaction",
+    require("./routes/transaction/cxQuotationRoutes")
+);
+app.use("/api/v1/transaction", require("./routes/transaction/cxQDetilRoutes"));
+app.use("/api/v1/transaction", require("./routes/transaction/cxInvoiceRoutes"));
+app.use("/api/v1/transaction", require("./routes/transaction/cxIDetilRoutes"));
+
+app.use("/api/v1/transaction", require("./routes/transaction/lastMileRoutes"));
+app.use(
+    "/api/v1/transaction",
+    require("./routes/transaction/lastMileDetilRotues")
+);
+app.use("/api/v1/transaction", require("./routes/transaction/grRoutes"));
+app.use("/api/v1/transaction", require("./routes/transaction/grDetilRoutes"));
+
+// Default route
 app.get("/", (req, res) => {
     res.send("Welcome to API");
 });
