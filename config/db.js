@@ -19,10 +19,7 @@ const sequelize = new Sequelize(
             timestamps: true, // Enable timestamps globally
         },
         dialectOptions: {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false, // Allow self-signed certificates
-            },
+            ssl: false,
         },
     }
 );
