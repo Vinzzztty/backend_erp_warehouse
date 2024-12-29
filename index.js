@@ -69,6 +69,25 @@ app.use(
 app.use("/api/v1/transaction", require("./routes/transaction/grRoutes"));
 app.use("/api/v1/transaction", require("./routes/transaction/grDetilRoutes"));
 
+// Product Pricing Route
+app.use(
+    "/api/v1/product_pricing",
+    require("./routes/product_pricing/bpRoutes")
+);
+
+app.use(
+    "/api/v1/product_pricing",
+    require("./routes/product_pricing/bpDetilRoutes")
+);
+app.use(
+    "/api/v1/product_pricing",
+    require("./routes/product_pricing/spRoutes")
+);
+app.use(
+    "/api/v1/product_pricing",
+    require("./routes/product_pricing/spDetilRoutes")
+);
+
 // Default route
 app.get("/", (req, res) => {
     res.send("Welcome to API");
