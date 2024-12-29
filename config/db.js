@@ -10,7 +10,7 @@ const sequelize = new Sequelize(
     process.env.USER_PASSWORD,
     {
         host: process.env.USER_HOST,
-        port: process.env.USER_PORT,
+        port: process.env.USER_PORT, // Enable when use AIVEN
         dialect: "mysql", // Specify the dialect explicitly
         dialectModule: mysql2,
         timezone: "+07:00", // Set the timezone to Jakarta
