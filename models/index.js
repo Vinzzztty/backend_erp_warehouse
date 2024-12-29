@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const sequelize = require("../config/db_local");
+const sequelize = require("../config/db");
 
 const db = {};
 
