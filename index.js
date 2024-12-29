@@ -6,7 +6,14 @@ const sequelize = require("./config/db");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// Configure CORS
+app.use(
+    cors({
+        origin: "https://your-frontend-url.com", // Replace with your frontend URL
+        methods: "GET,POST,PUT,DELETE",
+        credentials: true,
+    })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
