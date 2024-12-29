@@ -6,10 +6,15 @@ const sequelize = require("./config/db");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configure CORS
+const allowedOrigins = [
+    "http://localhost:3000", // Development
+    "https://fe-erp-warehouse.vercel.app", // Production
+];
+
 app.use(
     cors({
         origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps or Postman)
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
