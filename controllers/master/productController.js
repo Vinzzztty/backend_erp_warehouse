@@ -9,6 +9,8 @@ const UoM = db.UoM;
 const Store = db.Store;
 const Channel = db.Channel;
 
+const { uploadImage } = require("../../utils/imageKit");
+
 exports.createProduct = async (req, res) => {
     try {
         const {
@@ -24,7 +26,6 @@ exports.createProduct = async (req, res) => {
             Content,
             UoM,
             Notes,
-            ImageURL,
             Status,
             Length,
             Width,
@@ -40,65 +41,31 @@ exports.createProduct = async (req, res) => {
             SKUCodeEcommerce,
         } = req.body;
 
-        // 1. Check required associations
-        // Company is required
+        // Validate associations (e.g., Company, Category)
         const company = await Company.findByPk(CompanyCode);
         if (!company) {
-            return res.status(404).json({
-                status: { code: 404, message: "Company not found" },
-            });
+            return res
+                .status(404)
+                .json({ status: { code: 404, message: "Company not found" } });
         }
 
-        // Category is required
         const category = await Category.findByPk(CategoryCode);
         if (!category) {
-            return res.status(404).json({
-                status: { code: 404, message: "Category not found" },
-            });
+            return res
+                .status(404)
+                .json({ status: { code: 404, message: "Category not found" } });
         }
 
-        // 2. Check optional associations
-        let variant = null;
-        if (VariantId) {
-            variant = await Variant.findByPk(VariantId);
-            if (!variant) {
-                return res.status(404).json({
-                    status: { code: 404, message: "Variant not found" },
-                });
-            }
+        // Handle image upload if provided
+        let imageUrl = null;
+        if (req.file) {
+            imageUrl = await uploadImage(
+                req.file.buffer,
+                req.file.originalname
+            );
         }
 
-        let uom = null;
-        if (UoM) {
-            uom = await db.UoM.findByPk(UoM);
-            if (!uom) {
-                return res.status(404).json({
-                    status: { code: 404, message: "UoM not found" },
-                });
-            }
-        }
-
-        let store = null;
-        if (StoreName) {
-            store = await Store.findByPk(StoreName);
-            if (!store) {
-                return res.status(404).json({
-                    status: { code: 404, message: "Store not found" },
-                });
-            }
-        }
-
-        let channel = null;
-        if (ChannelCode) {
-            channel = await Channel.findByPk(ChannelCode);
-            if (!channel) {
-                return res.status(404).json({
-                    status: { code: 404, message: "Channel not found" },
-                });
-            }
-        }
-
-        // 3. Create the product
+        // Create the product
         const newProduct = await Product.create({
             Name,
             CodeName,
@@ -112,7 +79,7 @@ exports.createProduct = async (req, res) => {
             Content,
             UoM,
             Notes,
-            ImageURL,
+            ImageURL: imageUrl,
             Status,
             Length,
             Width,
@@ -121,31 +88,19 @@ exports.createProduct = async (req, res) => {
             Parameter,
             Keyword,
             StoreName,
-            Channel: ChannelCode, // We use "Channel" as the foreign key
+            Channel: ChannelCode,
             InitialChannel,
             CategoryFromChannel,
             CodeNumber,
             SKUCodeEcommerce,
         });
 
-        // After-create hook will populate additional SKU fields automatically.
-        // If you prefer to update fields in one shot, you can:
-        // await newProduct.reload();
-
         res.status(201).json({
             status: { code: 201, message: "Product created successfully" },
             data: newProduct,
         });
     } catch (error) {
-        if (error.name === "SequelizeUniqueConstraintError") {
-            return res.status(400).json({
-                status: { code: 400, message: "SKUCode must be unique" },
-            });
-        }
-
-        res.status(500).json({
-            status: { code: 500, message: error.message },
-        });
+        res.status(500).json({ status: { code: 500, message: error.message } });
     }
 };
 
@@ -246,6 +201,15 @@ exports.updateProduct = async (req, res) => {
             SKUCodeEcommerce,
         } = req.body;
 
+        // Handle image upload if a new image is provided
+        let imageUrl = existingProduct.ImageURL; // Keep the existing URL if no new image is uploaded
+        if (req.file) {
+            imageUrl = await uploadImage(
+                req.file.buffer,
+                req.file.originalname
+            );
+        }
+
         // Check required association changes (if provided)
         if (CompanyCode && CompanyCode !== existingProduct.CompanyCode) {
             const company = await Company.findByPk(CompanyCode);
@@ -316,7 +280,7 @@ exports.updateProduct = async (req, res) => {
             Content,
             UoM,
             Notes,
-            ImageURL,
+            ImageURL: imageUrl,
             Status,
             Length,
             Width,

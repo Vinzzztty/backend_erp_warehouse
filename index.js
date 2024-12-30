@@ -2,6 +2,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/db");
+const upload = require("./middleware/upload");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
