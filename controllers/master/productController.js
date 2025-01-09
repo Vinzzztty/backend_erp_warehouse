@@ -1,3 +1,25 @@
+const ImageKit = require("imagekit");
+
+// ImageKit setup
+const imagekit = new ImageKit({
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+});
+
+// Helper function for image upload
+const uploadImageToImageKit = async (fileBuffer, fileName) => {
+    try {
+        const result = await imagekit.upload({
+            file: fileBuffer,
+            fileName: fileName,
+        });
+        return result.url;
+    } catch (error) {
+        throw new Error("Failed to upload image to ImageKit: " + error.message);
+    }
+};
+
 const db = require("../../models");
 const Product = db.Product;
 
@@ -8,8 +30,6 @@ const Variant = db.Variant;
 const UoM = db.UoM;
 const Store = db.Store;
 const Channel = db.Channel;
-
-const { uploadImage } = require("../../utils/imageKit");
 
 exports.createProduct = async (req, res) => {
     try {
@@ -59,7 +79,7 @@ exports.createProduct = async (req, res) => {
         // Handle image upload if provided
         let imageUrl = null;
         if (req.file) {
-            imageUrl = await uploadImage(
+            imageUrl = await uploadImageToImageKit(
                 req.file.buffer,
                 req.file.originalname
             );
@@ -185,7 +205,6 @@ exports.updateProduct = async (req, res) => {
             Content,
             UoM,
             Notes,
-            ImageURL,
             Status,
             Length,
             Width,
@@ -204,13 +223,13 @@ exports.updateProduct = async (req, res) => {
         // Handle image upload if a new image is provided
         let imageUrl = existingProduct.ImageURL; // Keep the existing URL if no new image is uploaded
         if (req.file) {
-            imageUrl = await uploadImage(
+            imageUrl = await uploadImageToImageKit(
                 req.file.buffer,
                 req.file.originalname
             );
         }
 
-        // Check required association changes (if provided)
+        // Validate associations if provided
         if (CompanyCode && CompanyCode !== existingProduct.CompanyCode) {
             const company = await Company.findByPk(CompanyCode);
             if (!company) {
@@ -225,43 +244,6 @@ exports.updateProduct = async (req, res) => {
             if (!category) {
                 return res.status(404).json({
                     status: { code: 404, message: "Category not found" },
-                });
-            }
-        }
-
-        // Check optional associations
-        if (VariantId) {
-            const variant = await Variant.findByPk(VariantId);
-            if (!variant) {
-                return res.status(404).json({
-                    status: { code: 404, message: "Variant not found" },
-                });
-            }
-        }
-
-        if (UoM) {
-            const uom = await db.UoM.findByPk(UoM);
-            if (!uom) {
-                return res.status(404).json({
-                    status: { code: 404, message: "UoM not found" },
-                });
-            }
-        }
-
-        if (StoreName) {
-            const store = await Store.findByPk(StoreName);
-            if (!store) {
-                return res.status(404).json({
-                    status: { code: 404, message: "Store not found" },
-                });
-            }
-        }
-
-        if (ChannelCode) {
-            const channel = await Channel.findByPk(ChannelCode);
-            if (!channel) {
-                return res.status(404).json({
-                    status: { code: 404, message: "Channel not found" },
                 });
             }
         }
@@ -296,19 +278,11 @@ exports.updateProduct = async (req, res) => {
             SKUCodeEcommerce,
         });
 
-        // Reload to ensure afterUpdate hooks or changes are consistent
-        await existingProduct.reload();
-
         res.status(200).json({
             status: { code: 200, message: "Product updated successfully" },
             data: existingProduct,
         });
     } catch (error) {
-        if (error.name === "SequelizeUniqueConstraintError") {
-            return res.status(400).json({
-                status: { code: 400, message: "SKUCode must be unique" },
-            });
-        }
         res.status(500).json({
             status: { code: 500, message: error.message },
         });
