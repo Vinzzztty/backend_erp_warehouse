@@ -1,4 +1,5 @@
 const ImageKit = require("imagekit");
+const sharp = require("sharp");
 
 // ImageKit setup
 const imagekit = new ImageKit({
@@ -78,11 +79,16 @@ exports.createProduct = async (req, res) => {
 
         // Handle image upload if provided
         let imageUrl = null;
+        let dimensions = { width: null, height: null };
         if (req.file) {
             imageUrl = await uploadImageToImageKit(
                 req.file.buffer,
                 req.file.originalname
             );
+
+            // Extract image dimensions
+            const metadata = await sharp(req.file.buffer).metadata();
+            dimensions = { width: metadata.width, height: metadata.height };
         }
 
         // Create the product
@@ -101,9 +107,9 @@ exports.createProduct = async (req, res) => {
             Notes,
             ImageURL: imageUrl,
             Status,
-            Length,
-            Width,
-            Height,
+            Length: dimensions.height,
+            Width: dimensions.width,
+            Height: dimensions.height,
             Weight,
             Parameter,
             Keyword,
@@ -222,11 +228,19 @@ exports.updateProduct = async (req, res) => {
 
         // Handle image upload if a new image is provided
         let imageUrl = existingProduct.ImageURL; // Keep the existing URL if no new image is uploaded
+        let dimensions = {
+            width: existingProduct.width,
+            height: existingProduct.height,
+        };
         if (req.file) {
             imageUrl = await uploadImageToImageKit(
                 req.file.buffer,
                 req.file.originalname
             );
+
+            // Extract image dimensions
+            const metadata = await sharp(req.file.buffer).metadata();
+            dimensions = { width: metadata.width, height: metadata.height };
         }
 
         // Validate associations if provided
@@ -264,9 +278,9 @@ exports.updateProduct = async (req, res) => {
             Notes,
             ImageURL: imageUrl,
             Status,
-            Length,
-            Width,
-            Height,
+            Length: dimensions.height, // Auto-fill Length
+            Width: dimensions.width, // Auto-fill Width
+            Height: dimensions.height, // Example: Setting Height equal to Length
             Weight,
             Parameter,
             Keyword,
