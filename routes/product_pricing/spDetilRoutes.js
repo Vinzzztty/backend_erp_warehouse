@@ -20,6 +20,12 @@ router.get(
     settingPriceDetailsController.getSettingPriceDetailsById
 );
 
+// Get a single SettingPriceDetails by Code
+router.get(
+    "/setting-price-details/code/:code",
+    settingPriceDetailsController.getSettingPriceDetailsByCode
+);
+
 // Update a SettingPriceDetails
 router.put(
     "/setting-price-details/:id",

@@ -139,6 +139,41 @@ exports.getSettingPriceDetailsById = async (req, res) => {
 };
 
 /**
+ * Get a single SettingPriceDetails by Code
+ */
+exports.getSettingPriceDetailsByCode = async (req, res) => {
+    try {
+        const { code } = req.params;
+
+        const detail = await SettingPriceDetails.findOne({
+            where: { code }, // Assuming 'code' is a field in SettingPriceDetails
+            include: [
+                { model: db.SettingPrice, as: "SettingPrice" },
+                { model: db.Product, as: "Product" },
+            ],
+        });
+
+        if (!detail) {
+            return res.status(404).json({
+                status: { code: 404, message: "SettingPriceDetails not found" },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "SettingPriceDetails retrieved successfully",
+            },
+            data: detail,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
+/**
  * Update SettingPriceDetails
  */
 exports.updateSettingPriceDetails = async (req, res) => {
