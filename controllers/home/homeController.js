@@ -2,26 +2,34 @@ const db = require("../../models");
 
 exports.getTotalsMaster = async (req, res) => {
     try {
-        // Count totals for each entity
-        const productTotal = await db.Product.count();
-        const financeTotal = await db.Cost.count(); // Example for finance-related data
-        const businessTotal = await db.Company.count();
-        const warehouseTotal = await db.Warehouse.count();
-        const wilayahTotal = await db.City.count();
+        // Count data for all entities
+        const totals = {
+            bank: await db.Bank.count(),
+            category: await db.Category.count(),
+            channel: await db.Channel.count(),
+            city: await db.City.count(),
+            company: await db.Company.count(),
+            cost: await db.Cost.count(),
+            country: await db.Country.count(),
+            currency: await db.Currency.count(),
+            forwarder: await db.Forwarder.count(),
+            ppnSetting: await db.PPNSetting.count(),
+            product: await db.Product.count(),
+            province: await db.Province.count(),
+            store: await db.Store.count(),
+            supplier: await db.Supplier.count(),
+            uom: await db.UoM.count(),
+            variant: await db.Variant.count(),
+            warehouse: await db.Warehouse.count(),
+        };
 
-        // Return the totals
+        // Respond with the aggregated totals
         res.status(200).json({
             success: true,
-            data: {
-                product: productTotal,
-                finance: financeTotal,
-                business: businessTotal,
-                warehouse: warehouseTotal,
-                wilayah: wilayahTotal,
-            },
+            data: totals,
         });
     } catch (error) {
-        console.error("Error fetching dashboard totals:", error);
+        console.error("Error fetching totals:", error);
         res.status(500).json({
             success: false,
             message: error.message,
@@ -32,24 +40,18 @@ exports.getTotalsMaster = async (req, res) => {
 // Retrieve totals for transactions
 exports.getTransactionTotals = async (req, res) => {
     try {
-        // Count data for transaction-related entities
+        // Count totals for main transaction models
         const totals = {
-            cxl: await db.Cxl.count(),
-            cxInvoice: await db.CxInvoice.count(),
-            cxQDetail: await db.CxQDetail.count(),
-            cxQuotation: await db.CxQuotation.count(),
-            gr: await db.Gr.count(),
-            grDetail: await db.GrDetail.count(),
-            lastMile: await db.LastMile.count(),
-            lastMileDetail: await db.LastMileDetail.count(),
-            pi: await db.Pi.count(),
-            piDetail: await db.PiDetail.count(),
-            piPayment: await db.PiPayment.count(),
             purchaseOrder: await db.PurchaseOrder.count(),
-            purchaseOrderDetail: await db.PurchaseOrderDetail.count(),
+            proformaInvoice: await db.ProformaInvoice.count(),
+            piPayment: await db.PiPayment.count(),
+            cxQuotation: await db.CxQuotation.count(),
+            cxInvoice: await db.CxInvoice.count(),
+            lastMile: await db.LastMile.count(),
+            goodsReceipt: await db.GoodsReceipt.count(),
         };
 
-        // Respond with the aggregated totals
+        // Return the totals
         res.status(200).json({
             success: true,
             data: totals,
