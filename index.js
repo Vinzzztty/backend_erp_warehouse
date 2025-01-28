@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
     "http://localhost:3000", // Development
     "https://fe-erp-warehouse.vercel.app", // Production
+    "https://backend-erp-warehouse.vercel.app/", // Production
 ];
 
 app.use(
@@ -33,6 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/v1/auth", require("./routes/auth/authRoutes"));
+app.use("/api/v1/home", require("./routes/home/homeRoutes"));
 
 // Master routes
 app.use("/api/v1/master", require("./routes/master/companyRoutes"));
