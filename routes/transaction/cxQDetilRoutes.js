@@ -20,6 +20,12 @@ router.get(
     cxQuotationDetailsController.getCxQuotationDetailById
 );
 
+// Get CxQuotationDetails by CxQuotationId
+router.get(
+    "/cx-quotation-details/by-cx-quotation/:CxQuotationId",
+    cxQuotationDetailsController.getCxQuotationDetailsByCxQuotationId
+);
+
 // Update a CxQuotationDetail
 router.put(
     "/cx-quotation-details/:id",

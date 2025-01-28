@@ -20,6 +20,13 @@ router.get(
     proformaInvoiceDetailsController.getProformaInvoiceDetailById
 );
 
+// Get ProformaInvoiceDetails by ProformaInvoiceId
+router.get(
+    "/proforma-invoice-details/by-proforma-invoice/:ProformaInvoiceId",
+    proformaInvoiceDetailsController.getProformaInvoiceDetailsByProformaInvoiceId
+);
+
+
 // Update a ProformaInvoiceDetail
 router.put(
     "/proforma-invoice-details/:id",

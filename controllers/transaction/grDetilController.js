@@ -89,6 +89,42 @@ exports.getAllGoodsReceiptDetils = async (req, res) => {
 };
 
 /**
+ * Get GoodsReceiptDetils by GoodsReceiptId
+ */
+exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
+    try {
+        const { GoodsReceiptId } = req.params;
+
+        const detils = await GoodsReceiptDetil.findAll({
+            where: { GoodsReceiptId },
+            include: [{ model: GoodsReceipt, as: "GoodsReceipt" }],
+        });
+
+        if (!detils || detils.length === 0) {
+            return res.status(404).json({
+                status: {
+                    code: 404,
+                    message:
+                        "No GoodsReceiptDetils found for the given GoodsReceiptId",
+                },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "GoodsReceiptDetils retrieved successfully",
+            },
+            data: detils,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
+/**
  * Get a GoodsReceiptDetil by ID
  */
 exports.getGoodsReceiptDetilById = async (req, res) => {

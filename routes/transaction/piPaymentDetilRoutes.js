@@ -20,6 +20,12 @@ router.get(
     piPaymentDetailsController.getPiPaymentDetailsById
 );
 
+// Get PiPaymentDetails by PiPaymentId
+router.get(
+    "/pi-payment-details/by-pi-payment/:PiPaymentId",
+    piPaymentDetailsController.getPiPaymentDetailsByPiPaymentId
+);
+
 // Update PiPaymentDetails
 router.put(
     "/pi-payment-details/:id",

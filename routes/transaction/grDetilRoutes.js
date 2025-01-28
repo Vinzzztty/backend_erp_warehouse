@@ -20,6 +20,13 @@ router.get(
     goodsReceiptDetilController.getGoodsReceiptDetilById
 );
 
+// Get GoodsReceiptDetils by GoodsReceiptId
+router.get(
+    "/goods-receipt-detils/by-goods-receipt/:GoodsReceiptId",
+    goodsReceiptDetilController.getGoodsReceiptDetilsByGoodsReceiptId
+);
+
+
 // Update a GoodsReceiptDetil
 router.put(
     "/goods-receipt-detils/:id",

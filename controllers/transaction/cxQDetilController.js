@@ -110,6 +110,45 @@ exports.getAllCxQuotationDetails = async (req, res) => {
     }
 };
 
+/**
+ * Get CxQuotationDetails by CxQuotationId
+ */
+exports.getCxQuotationDetailsByCxQuotationId = async (req, res) => {
+    try {
+        const { CxQuotationId } = req.params;
+
+        const details = await CxQuotationDetails.findAll({
+            where: { CxQuotationId },
+            include: [
+                { model: CxQuotation, as: "CxQuotation" },
+                { model: ProformaInvoice, as: "ProformaInvoice" },
+            ],
+        });
+
+        if (!details || details.length === 0) {
+            return res.status(404).json({
+                status: {
+                    code: 404,
+                    message:
+                        "No CxQuotationDetails found for the given CxQuotationId",
+                },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "CxQuotationDetails retrieved successfully",
+            },
+            data: details,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
 exports.getCxQuotationDetailById = async (req, res) => {
     try {
         const { id } = req.params;

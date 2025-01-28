@@ -20,6 +20,11 @@ router.get(
     purchaseOrderDetailsController.getPurchaseOrderDetailById
 );
 
+router.get(
+    "/purchase-order-details/by-purchase-order/:PurchaseOrderId",
+    purchaseOrderDetailsController.getPurchaseOrderDetailsByPurchaseOrderId
+);
+
 // Update a PurchaseOrderDetail by ID
 router.put(
     "/purchase-order-details/:id",

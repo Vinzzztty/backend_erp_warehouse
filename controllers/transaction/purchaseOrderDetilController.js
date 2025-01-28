@@ -117,6 +117,41 @@ exports.getAllPurchaseOrderDetails = async (req, res) => {
     }
 };
 
+exports.getPurchaseOrderDetailsByPurchaseOrderId = async (req, res) => {
+    try {
+        const { PurchaseOrderId } = req.params;
+
+        const details = await PurchaseOrderDetails.findAll({
+            where: { PurchaseOrderId },
+            include: [
+                { model: PurchaseOrder, as: "PurchaseOrder" },
+                { model: Product, as: "Product" },
+            ],
+        });
+
+        if (!details || details.length === 0) {
+            return res.status(404).json({
+                status: {
+                    code: 404,
+                    message: "No details found for the given PurchaseOrderId",
+                },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "PurchaseOrderDetails retrieved successfully",
+            },
+            data: details,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
 exports.getPurchaseOrderDetailById = async (req, res) => {
     try {
         const { id } = req.params;

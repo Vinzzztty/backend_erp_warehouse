@@ -105,6 +105,45 @@ exports.getAllCxInvoiceDetails = async (req, res) => {
 };
 
 /**
+ * Get CxInvoiceDetails by TransaksiCxInvoiceId
+ */
+exports.getCxInvoiceDetailsByTransaksiCxInvoiceId = async (req, res) => {
+    try {
+        const { TransaksiCxInvoiceId } = req.params;
+
+        const details = await CxInvoiceDetails.findAll({
+            where: { TransaksiCxInvoiceId },
+            include: [
+                { model: CxInvoice, as: "TransaksiCxInvoice" },
+                { model: CxQuotation, as: "CxQuotation" },
+            ],
+        });
+
+        if (!details || details.length === 0) {
+            return res.status(404).json({
+                status: {
+                    code: 404,
+                    message:
+                        "No CxInvoiceDetails found for the given TransaksiCxInvoiceId",
+                },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "CxInvoiceDetails retrieved successfully",
+            },
+            data: details,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
+/**
  * Get a single CxInvoiceDetails by ID
  */
 exports.getCxInvoiceDetailById = async (req, res) => {

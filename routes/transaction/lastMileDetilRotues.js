@@ -20,6 +20,12 @@ router.get(
     lastMileDetailsController.getLastMileDetailById
 );
 
+// Get LastMileDetails by TransaksiLastMileId
+router.get(
+    "/last-mile-details/by-transaksi-last-mile/:TransaksiLastMileId",
+    lastMileDetailsController.getLastMileDetailsByTransaksiLastMileId
+);
+
 // Update a LastMileDetail
 router.put(
     "/last-mile-details/:id",

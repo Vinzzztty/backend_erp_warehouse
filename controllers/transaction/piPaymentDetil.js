@@ -101,6 +101,45 @@ exports.getAllPiPaymentDetails = async (req, res) => {
 };
 
 /**
+ * Get PiPaymentDetails by PiPaymentId
+ */
+exports.getPiPaymentDetailsByPiPaymentId = async (req, res) => {
+    try {
+        const { PiPaymentId } = req.params;
+
+        const details = await PiPaymentDetails.findAll({
+            where: { PiPaymentId },
+            include: [
+                { model: PiPayment, as: "PiPayment" },
+                { model: ProformaInvoice, as: "ProformaInvoice" },
+            ],
+        });
+
+        if (!details || details.length === 0) {
+            return res.status(404).json({
+                status: {
+                    code: 404,
+                    message:
+                        "No PiPaymentDetails found for the given PiPaymentId",
+                },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "PiPaymentDetails retrieved successfully",
+            },
+            data: details,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
+/**
  * Get a single PiPaymentDetails by ID
  */
 exports.getPiPaymentDetailsById = async (req, res) => {

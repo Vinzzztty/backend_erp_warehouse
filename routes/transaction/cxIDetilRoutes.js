@@ -20,6 +20,12 @@ router.get(
     cxInvoiceDetailsController.getCxInvoiceDetailById
 );
 
+// Get CxInvoiceDetails by TransaksiCxInvoiceId
+router.get(
+    "/cx-invoice-details/by-transaksi-cx-invoice/:TransaksiCxInvoiceId",
+    cxInvoiceDetailsController.getCxInvoiceDetailsByTransaksiCxInvoiceId
+);
+
 // Update a CxInvoiceDetail
 router.put(
     "/cx-invoice-details/:id",
