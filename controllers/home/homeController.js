@@ -2,34 +2,26 @@ const db = require("../../models");
 
 exports.getTotalsMaster = async (req, res) => {
     try {
-        // Count data for all entities
-        const totals = {
-            bank: await db.Bank.count(),
-            category: await db.Category.count(),
-            channel: await db.Channel.count(),
-            city: await db.City.count(),
-            company: await db.Company.count(),
-            cost: await db.Cost.count(),
-            country: await db.Country.count(),
-            currency: await db.Currency.count(),
-            forwarder: await db.Forwarder.count(),
-            ppnSetting: await db.PpnSetting.count(),
-            product: await db.Product.count(),
-            province: await db.Province.count(),
-            store: await db.Store.count(),
-            supplier: await db.Supplier.count(),
-            uom: await db.Uom.count(),
-            variant: await db.Variant.count(),
-            warehouse: await db.Warehouse.count(),
-        };
+        // Count totals for each entity
+        const productTotal = await db.Product.count();
+        const financeTotal = await db.Cost.count(); // Example for finance-related data
+        const businessTotal = await db.Company.count();
+        const warehouseTotal = await db.Warehouse.count();
+        const wilayahTotal = await db.City.count();
 
-        // Respond with the aggregated totals
+        // Return the totals
         res.status(200).json({
             success: true,
-            data: totals,
+            data: {
+                product: productTotal,
+                finance: financeTotal,
+                business: businessTotal,
+                warehouse: warehouseTotal,
+                wilayah: wilayahTotal,
+            },
         });
     } catch (error) {
-        console.error("Error fetching totals:", error);
+        console.error("Error fetching dashboard totals:", error);
         res.status(500).json({
             success: false,
             message: error.message,
