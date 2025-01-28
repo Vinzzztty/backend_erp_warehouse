@@ -20,6 +20,12 @@ router.get(
     buyingPriceDetailsController.getBuyingPriceDetailsById
 );
 
+// Get a single BuyingPriceDetails by BuyingPriceId
+router.get(
+    "/buying-price-details/buying-price/:buyingPriceId",
+    buyingPriceDetailsController.getBuyingPriceDetailsByBuyingPriceId
+);
+
 // Update BuyingPriceDetails
 router.put(
     "/buying-price-details/:id",

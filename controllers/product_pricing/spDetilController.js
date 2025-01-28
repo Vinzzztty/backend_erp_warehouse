@@ -139,14 +139,14 @@ exports.getSettingPriceDetailsById = async (req, res) => {
 };
 
 /**
- * Get a single SettingPriceDetails by Code
+ * Get a single SettingPriceDetails by SettingPriceId
  */
-exports.getSettingPriceDetailsByCode = async (req, res) => {
+exports.getSettingPriceDetailsBySettingPriceId = async (req, res) => {
     try {
-        const { code } = req.params;
+        const { settingPriceId } = req.params;
 
         const detail = await SettingPriceDetails.findOne({
-            where: { code }, // Assuming 'code' is a field in SettingPriceDetails
+            where: { SettingPriceId: settingPriceId }, // Assuming "SettingPriceId" is the foreign key
             include: [
                 { model: db.SettingPrice, as: "SettingPrice" },
                 { model: db.Product, as: "Product" },

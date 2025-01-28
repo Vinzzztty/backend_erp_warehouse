@@ -115,6 +115,42 @@ exports.getAllBuyingPriceDetails = async (req, res) => {
 };
 
 /**
+ * Get BuyingPriceDetails by BuyingPriceId
+ */
+exports.getBuyingPriceDetailsByBuyingPriceId = async (req, res) => {
+    try {
+        const { buyingPriceId } = req.params;
+
+        const detail = await BuyingPriceDetails.findOne({
+            where: { BuyingPriceId: buyingPriceId }, // Assuming "BuyingPriceId" is the foreign key
+            include: [
+                { model: BuyingPrice, as: "BuyingPrice" },
+                { model: ProformaInvoice, as: "ProformaInvoice" },
+                { model: Cost, as: "Cost" },
+            ],
+        });
+
+        if (!detail) {
+            return res.status(404).json({
+                status: { code: 404, message: "BuyingPriceDetails not found" },
+            });
+        }
+
+        return res.status(200).json({
+            status: {
+                code: 200,
+                message: "BuyingPriceDetails retrieved successfully",
+            },
+            data: detail,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
+    }
+};
+
+/**
  * Get BuyingPriceDetails by ID
  */
 exports.getBuyingPriceDetailsById = async (req, res) => {
