@@ -116,27 +116,27 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
             const goodsReceipt = detil.GoodsReceipt;
 
             if (goodsReceipt) {
-                // Fetch Forwarder Name
+                // Fetch Forwarder Name (using Code instead of Id)
                 const forwarder = await db.Forwarder.findOne({
-                    where: { Id: goodsReceipt.ForwarderId },
-                    attributes: ["Id", "Name"],
+                    where: { Code: goodsReceipt.ForwarderId }, // ✅ Use Code instead of Id
+                    attributes: ["Code", "Name"],
                 });
 
-                // Fetch Warehouse Name
+                // Fetch Warehouse Name (using Code instead of Id)
                 const warehouse = await db.Warehouse.findOne({
-                    where: { Id: goodsReceipt.WarehouseId },
-                    attributes: ["Id", "Name"],
+                    where: { Code: goodsReceipt.WarehouseId }, // ✅ Use Code instead of Id
+                    attributes: ["Code", "Name"],
                 });
 
                 // Attach Forwarder & Warehouse to response
                 detil.GoodsReceipt = {
                     ...goodsReceipt.toJSON(),
                     Forwarder: forwarder || {
-                        Id: goodsReceipt.ForwarderId,
+                        Code: goodsReceipt.ForwarderId,
                         Name: "Unknown Forwarder",
                     },
                     Warehouse: warehouse || {
-                        Id: goodsReceipt.WarehouseId,
+                        Code: goodsReceipt.WarehouseId,
                         Name: "Unknown Warehouse",
                     },
                 };
