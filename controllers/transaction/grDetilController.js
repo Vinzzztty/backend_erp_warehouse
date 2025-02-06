@@ -111,34 +111,51 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
             });
         }
 
-        // Step 2: Extract GoodsReceipt and fetch Forwarder & Warehouse separately
+        // Step 2: Extract unique Forwarder and Warehouse IDs
+        const forwarderIds = [
+            ...new Set(detils.map((d) => d.GoodsReceipt.ForwarderId)),
+        ];
+        const warehouseIds = [
+            ...new Set(detils.map((d) => d.GoodsReceipt.WarehouseId)),
+        ];
+
+        // Step 3: Fetch all Forwarders and Warehouses in one query (Better performance)
+        const forwarders = await db.Forwarder.findAll({
+            where: { Code: forwarderIds },
+            attributes: ["Code", "Name"],
+        });
+
+        const warehouses = await db.Warehouse.findAll({
+            where: { Code: warehouseIds },
+            attributes: ["Code", "Name"],
+        });
+
+        // Step 4: Convert to lookup map
+        const forwarderMap = forwarders.reduce((map, obj) => {
+            map[obj.Code] = obj.Name;
+            return map;
+        }, {});
+
+        const warehouseMap = warehouses.reduce((map, obj) => {
+            map[obj.Code] = obj.Name;
+            return map;
+        }, {});
+
+        // Step 5: Attach Forwarder & Warehouse names
         for (const detil of detils) {
             const goodsReceipt = detil.GoodsReceipt;
-
             if (goodsReceipt) {
-                // Fetch Forwarder Name (using Code instead of Id)
-                const forwarder = await db.Forwarder.findOne({
-                    where: { Code: goodsReceipt.ForwarderId }, // ✅ Use Code instead of Id
-                    attributes: ["Code", "Name"],
-                });
-
-                // Fetch Warehouse Name (using Code instead of Id)
-                const warehouse = await db.Warehouse.findOne({
-                    where: { Code: goodsReceipt.WarehouseId }, // ✅ Use Code instead of Id
-                    attributes: ["Code", "Name"],
-                });
-
-                // Attach Forwarder & Warehouse to response
-                detil.GoodsReceipt = {
-                    ...goodsReceipt.toJSON(),
-                    Forwarder: forwarder || {
-                        Code: goodsReceipt.ForwarderId,
-                        Name: "Unknown Forwarder",
-                    },
-                    Warehouse: warehouse || {
-                        Code: goodsReceipt.WarehouseId,
-                        Name: "Unknown Warehouse",
-                    },
+                goodsReceipt.Forwarder = {
+                    Code: goodsReceipt.ForwarderId,
+                    Name:
+                        forwarderMap[goodsReceipt.ForwarderId] ||
+                        "Unknown Forwarder",
+                };
+                goodsReceipt.Warehouse = {
+                    Code: goodsReceipt.WarehouseId,
+                    Name:
+                        warehouseMap[goodsReceipt.WarehouseId] ||
+                        "Unknown Warehouse",
                 };
             }
         }
