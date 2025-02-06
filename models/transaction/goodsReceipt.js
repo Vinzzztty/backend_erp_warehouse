@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     );
 
+    // 🔹 Define Associations (Relationships)
     GoodsReceipt.associate = (models) => {
         GoodsReceipt.belongsTo(models.Forwarder, {
             foreignKey: "ForwarderId",

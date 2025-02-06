@@ -95,26 +95,10 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
     try {
         const { GoodsReceiptId } = req.params;
 
+        // Step 1: Fetch GoodsReceiptDetil first
         const detils = await GoodsReceiptDetil.findAll({
             where: { GoodsReceiptId },
-            include: [
-                {
-                    model: GoodsReceipt,
-                    as: "GoodsReceipt", // Match alias in the model
-                    include: [
-                        {
-                            model: db.Forwarder,
-                            as: "Forwarder",
-                            attributes: ["Id", "Name"],
-                        },
-                        {
-                            model: db.Warehouse,
-                            as: "Warehouse",
-                            attributes: ["Id", "Name"],
-                        },
-                    ],
-                },
-            ],
+            include: [{ model: GoodsReceipt, as: "GoodsReceipt" }],
         });
 
         if (!detils || detils.length === 0) {
@@ -125,6 +109,38 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
                         "No GoodsReceiptDetils found for the given GoodsReceiptId",
                 },
             });
+        }
+
+        // Step 2: Extract GoodsReceipt and fetch Forwarder & Warehouse separately
+        for (const detil of detils) {
+            const goodsReceipt = detil.GoodsReceipt;
+
+            if (goodsReceipt) {
+                // Fetch Forwarder Name
+                const forwarder = await db.Forwarder.findOne({
+                    where: { Id: goodsReceipt.ForwarderId },
+                    attributes: ["Id", "Name"],
+                });
+
+                // Fetch Warehouse Name
+                const warehouse = await db.Warehouse.findOne({
+                    where: { Id: goodsReceipt.WarehouseId },
+                    attributes: ["Id", "Name"],
+                });
+
+                // Attach Forwarder & Warehouse to response
+                detil.GoodsReceipt = {
+                    ...goodsReceipt.toJSON(),
+                    Forwarder: forwarder || {
+                        Id: goodsReceipt.ForwarderId,
+                        Name: "Unknown Forwarder",
+                    },
+                    Warehouse: warehouse || {
+                        Id: goodsReceipt.WarehouseId,
+                        Name: "Unknown Warehouse",
+                    },
+                };
+            }
         }
 
         return res.status(200).json({
