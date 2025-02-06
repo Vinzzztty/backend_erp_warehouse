@@ -132,12 +132,12 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
 
         // Step 4: Convert to lookup map
         const forwarderMap = forwarders.reduce((map, obj) => {
-            map[obj.Code] = obj.Name;
+            map[obj.Code] = obj; // Store full object { Code, Name }
             return map;
         }, {});
 
         const warehouseMap = warehouses.reduce((map, obj) => {
-            map[obj.Code] = obj.Name;
+            map[obj.Code] = obj; // Store full object { Code, Name }
             return map;
         }, {});
 
@@ -145,17 +145,17 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
         for (const detil of detils) {
             const goodsReceipt = detil.GoodsReceipt;
             if (goodsReceipt) {
-                goodsReceipt.Forwarder = {
+                goodsReceipt.Forwarder = forwarderMap[
+                    goodsReceipt.ForwarderId
+                ] || {
                     Code: goodsReceipt.ForwarderId,
-                    Name:
-                        forwarderMap[goodsReceipt.ForwarderId] ||
-                        "Unknown Forwarder",
+                    Name: "Unknown Forwarder",
                 };
-                goodsReceipt.Warehouse = {
+                goodsReceipt.Warehouse = warehouseMap[
+                    goodsReceipt.WarehouseId
+                ] || {
                     Code: goodsReceipt.WarehouseId,
-                    Name:
-                        warehouseMap[goodsReceipt.WarehouseId] ||
-                        "Unknown Warehouse",
+                    Name: "Unknown Warehouse",
                 };
             }
         }
