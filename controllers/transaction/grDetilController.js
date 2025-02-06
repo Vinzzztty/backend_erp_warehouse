@@ -97,7 +97,24 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
 
         const detils = await GoodsReceiptDetil.findAll({
             where: { GoodsReceiptId },
-            include: [{ model: GoodsReceipt, as: "GoodsReceipt" }],
+            include: [
+                {
+                    model: GoodsReceipt,
+                    as: "GoodsReceipt",
+                    include: [
+                        {
+                            model: Forwarder,
+                            as: "Forwarder",
+                            attributes: ["Id", "Name"],
+                        },
+                        {
+                            model: Warehouse,
+                            as: "Warehouse",
+                            attributes: ["Id", "Name"],
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!detils || detils.length === 0) {
