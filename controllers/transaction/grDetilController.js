@@ -100,15 +100,15 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
             include: [
                 {
                     model: GoodsReceipt,
-                    as: "GoodsReceipt",
+                    as: "GoodsReceipt", // Match alias in the model
                     include: [
                         {
-                            model: Forwarder,
+                            model: db.Forwarder,
                             as: "Forwarder",
                             attributes: ["Id", "Name"],
                         },
                         {
-                            model: Warehouse,
+                            model: db.Warehouse,
                             as: "Warehouse",
                             attributes: ["Id", "Name"],
                         },
