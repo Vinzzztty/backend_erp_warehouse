@@ -95,10 +95,27 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
     try {
         const { GoodsReceiptId } = req.params;
 
-        // Step 1: Fetch GoodsReceiptDetil first
+        // Step 1: Fetch GoodsReceiptDetil including GoodsReceipt, Forwarder, and Warehouse
         const detils = await GoodsReceiptDetil.findAll({
             where: { GoodsReceiptId },
-            include: [{ model: GoodsReceipt, as: "GoodsReceipt" }],
+            include: [
+                {
+                    model: GoodsReceipt,
+                    as: "GoodsReceipt",
+                    include: [
+                        {
+                            model: db.Forwarder,
+                            as: "Forwarder",
+                            attributes: ["Code", "Name"],
+                        },
+                        {
+                            model: db.Warehouse,
+                            as: "Warehouse",
+                            attributes: ["Code", "Name"],
+                        },
+                    ],
+                },
+            ],
         });
 
         if (!detils || detils.length === 0) {
@@ -109,55 +126,6 @@ exports.getGoodsReceiptDetilsByGoodsReceiptId = async (req, res) => {
                         "No GoodsReceiptDetils found for the given GoodsReceiptId",
                 },
             });
-        }
-
-        // Step 2: Extract unique Forwarder and Warehouse IDs
-        const forwarderIds = [
-            ...new Set(detils.map((d) => d.GoodsReceipt.ForwarderId)),
-        ];
-        const warehouseIds = [
-            ...new Set(detils.map((d) => d.GoodsReceipt.WarehouseId)),
-        ];
-
-        // Step 3: Fetch all Forwarders and Warehouses in one query (Better performance)
-        const forwarders = await db.Forwarder.findAll({
-            where: { Code: forwarderIds },
-            attributes: ["Code", "Name"],
-        });
-
-        const warehouses = await db.Warehouse.findAll({
-            where: { Code: warehouseIds },
-            attributes: ["Code", "Name"],
-        });
-
-        // Step 4: Convert to lookup map
-        const forwarderMap = forwarders.reduce((map, obj) => {
-            map[obj.Code] = obj; // Store full object { Code, Name }
-            return map;
-        }, {});
-
-        const warehouseMap = warehouses.reduce((map, obj) => {
-            map[obj.Code] = obj; // Store full object { Code, Name }
-            return map;
-        }, {});
-
-        // Step 5: Attach Forwarder & Warehouse names
-        for (const detil of detils) {
-            const goodsReceipt = detil.GoodsReceipt;
-            if (goodsReceipt) {
-                goodsReceipt.Forwarder = forwarderMap[
-                    goodsReceipt.ForwarderId
-                ] || {
-                    Code: goodsReceipt.ForwarderId,
-                    Name: "Unknown Forwarder",
-                };
-                goodsReceipt.Warehouse = warehouseMap[
-                    goodsReceipt.WarehouseId
-                ] || {
-                    Code: goodsReceipt.WarehouseId,
-                    Name: "Unknown Warehouse",
-                };
-            }
         }
 
         return res.status(200).json({
