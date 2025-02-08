@@ -69,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             EstimatedCBMTotal: {
-                type: DataTypes.DECIMAL(10, 2), // Auto-calculate, max 2 decimal places
+                type: DataTypes.DECIMAL(10, 6), // Increased precision for small CBM values
                 allowNull: true,
             },
             CartonWeight: {
@@ -77,11 +77,11 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             MarkingNumber: {
-                type: DataTypes.DECIMAL(10, 2), // Max 2 decimal places
+                type: DataTypes.STRING(255), // Change to STRING for compatibility
                 allowNull: true,
             },
             Credit: {
-                type: DataTypes.DECIMAL(10, 2), // Max 2 decimal places
+                type: DataTypes.STRING(255), // Change to STRING for compatibility
                 allowNull: true,
             },
             Note: {
@@ -95,11 +95,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     );
 
+    // ✅ Fix Before Save Hook for Calculations
     PurchaseOrderDetails.addHook("beforeSave", (details) => {
         if (details.CartonQty && details.UnitPrice) {
-            details.PricePerCarton = (
-                details.UnitPrice * details.CartonQty
-            ).toFixed(2);
+            details.PricePerCarton = parseFloat(
+                (details.UnitPrice * details.CartonQty).toFixed(2)
+            );
         }
 
         if (
@@ -108,13 +109,14 @@ module.exports = (sequelize, DataTypes) => {
             details.CartonT &&
             details.CartonQty
         ) {
-            details.EstimatedCBMTotal = (
-                (details.CartonP *
-                    details.CartonL *
-                    details.CartonT *
-                    details.CartonQty) /
-                1000000
-            ).toFixed(2);
+            details.EstimatedCBMTotal = parseFloat(
+                (
+                    (details.CartonP / 100) *
+                    (details.CartonL / 100) *
+                    (details.CartonT / 100) *
+                    details.CartonQty
+                ).toFixed(6)
+            );
         }
     });
 
