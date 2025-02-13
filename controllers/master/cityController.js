@@ -20,12 +20,25 @@ exports.createCity = async (req, res) => {
             return res.status(404).json({ error: "Country not found" });
         }
 
+        // Check if a city with the same Name already exists
+        const existingCity = await City.findOne({ where: { Name } });
+        if (existingCity) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "City with this name already exists",
+                },
+            });
+        }
+
+        // Create new city if Name is unique
         const newCity = await City.create({
             Name,
             ProvinceId,
             CountryId,
             Status,
         });
+
         res.status(201).json({
             status: { code: 201, message: "City created successfully" },
             data: newCity,
@@ -96,6 +109,23 @@ exports.updateCity = async (req, res) => {
             }
         }
 
+        // Check if another city with the same Name exists (excluding the current city)
+        if (Name) {
+            const existingCity = await City.findOne({
+                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current city
+            });
+
+            if (existingCity) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "City with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update city if Name is unique
         city.Name = Name ?? city.Name;
         city.ProvinceId = ProvinceId ?? city.ProvinceId;
         city.CountryId = CountryId ?? city.CountryId;

@@ -20,6 +20,17 @@ exports.createForwarder = async (req, res) => {
             Status,
         } = req.body;
 
+        // Check if a forwarder with the same Name already exists
+        const existingForwarder = await Forwarder.findOne({ where: { Name } });
+        if (existingForwarder) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Forwarder with this name already exists",
+                },
+            });
+        }
+
         // Check if CountryId exists
         const countryExists = await Country.findByPk(CountryId);
         if (!countryExists) {
@@ -126,23 +137,7 @@ exports.updateForwarder = async (req, res) => {
         } = req.body;
         const { id } = req.params;
 
-        // Check if CountryId exists
-        const countryExists = await Country.findByPk(CountryId);
-        if (!countryExists) {
-            return res.status(400).json({
-                status: { code: 400, message: "CountryId does not exist" },
-            });
-        }
-
-        // Check if BankId exists
-        const bankExists = await Bank.findByPk(BankId);
-        if (!bankExists) {
-            return res.status(400).json({
-                status: { code: 400, message: "BankId does not exist" },
-            });
-        }
-
-        // Proceed with forwarder update
+        // Check if the forwarder exists
         const forwarder = await Forwarder.findByPk(id);
         if (!forwarder) {
             return res.status(404).json({
@@ -150,21 +145,59 @@ exports.updateForwarder = async (req, res) => {
             });
         }
 
+        // Check if another forwarder with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingForwarder = await Forwarder.findOne({
+                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current forwarder
+            });
+
+            if (existingForwarder) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Forwarder with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Check if CountryId exists (only if provided)
+        if (CountryId) {
+            const countryExists = await Country.findByPk(CountryId);
+            if (!countryExists) {
+                return res.status(400).json({
+                    status: { code: 400, message: "CountryId does not exist" },
+                });
+            }
+        }
+
+        // Check if BankId exists (only if provided)
+        if (BankId) {
+            const bankExists = await Bank.findByPk(BankId);
+            if (!bankExists) {
+                return res.status(400).json({
+                    status: { code: 400, message: "BankId does not exist" },
+                });
+            }
+        }
+
+        // Proceed with forwarder update
         await forwarder.update({
-            Name,
-            CountryId,
-            BankId,
-            Notes,
-            AddressIndonesia,
-            CoordinateIndonesia,
-            Department,
-            ContactMethod,
-            Description,
-            AccountNumber,
-            Website,
-            Wechat,
-            ShippingMark,
-            Status,
+            Name: Name ?? forwarder.Name,
+            CountryId: CountryId ?? forwarder.CountryId,
+            BankId: BankId ?? forwarder.BankId,
+            Notes: Notes ?? forwarder.Notes,
+            AddressIndonesia: AddressIndonesia ?? forwarder.AddressIndonesia,
+            CoordinateIndonesia:
+                CoordinateIndonesia ?? forwarder.CoordinateIndonesia,
+            Department: Department ?? forwarder.Department,
+            ContactMethod: ContactMethod ?? forwarder.ContactMethod,
+            Description: Description ?? forwarder.Description,
+            AccountNumber: AccountNumber ?? forwarder.AccountNumber,
+            Website: Website ?? forwarder.Website,
+            Wechat: Wechat ?? forwarder.Wechat,
+            ShippingMark: ShippingMark ?? forwarder.ShippingMark,
+            Status: Status ?? forwarder.Status,
         });
 
         res.status(200).json({

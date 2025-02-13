@@ -5,6 +5,19 @@ exports.createCompany = async (req, res) => {
     try {
         const { Name, Notes, Status } = req.body;
 
+        // Check if a company with the same Name already exists
+        const existingCompany = await db.Company.findOne({ where: { Name } });
+
+        if (existingCompany) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Company with this name already exists",
+                },
+            });
+        }
+
+        // Create new company if Name is unique
         const newCompany = await db.Company.create({
             Name,
             Notes,
@@ -76,6 +89,21 @@ exports.updateCompany = async (req, res) => {
             });
         }
 
+        // Check if another company with the same Name exists
+        const existingCompany = await db.Company.findOne({
+            where: { Name, Code: { [db.Sequelize.Op.ne]: Code } }, // Exclude the current company
+        });
+
+        if (existingCompany) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Company with this name already exists",
+                },
+            });
+        }
+
+        // Update company if Name is unique
         await company.update({ Name, Notes, Status });
 
         res.status(200).json({

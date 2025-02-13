@@ -62,6 +62,17 @@ exports.createProduct = async (req, res) => {
             SKUCodeEcommerce,
         } = req.body;
 
+        // Check if a product with the same Name already exists
+        const existingProduct = await Product.findOne({ where: { Name } });
+        if (existingProduct) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Product with this name already exists",
+                },
+            });
+        }
+
         // Validate associations (e.g., Company, Category)
         const company = await Company.findByPk(CompanyCode);
         if (!company) {
@@ -191,6 +202,7 @@ exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
 
+        // Check if the product exists
         const existingProduct = await Product.findByPk(id);
         if (!existingProduct) {
             return res.status(404).json({
@@ -226,11 +238,27 @@ exports.updateProduct = async (req, res) => {
             SKUCodeEcommerce,
         } = req.body;
 
+        // Check if another product with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingProductByName = await Product.findOne({
+                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current product
+            });
+
+            if (existingProductByName) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Product with this name already exists",
+                    },
+                });
+            }
+        }
+
         // Handle image upload if a new image is provided
         let imageUrl = existingProduct.ImageURL; // Keep the existing URL if no new image is uploaded
         let dimensions = {
-            width: existingProduct.width,
-            height: existingProduct.height,
+            width: existingProduct.Width,
+            height: existingProduct.Height,
         };
         if (req.file) {
             imageUrl = await uploadImageToImageKit(
@@ -264,32 +292,34 @@ exports.updateProduct = async (req, res) => {
 
         // Proceed with update
         await existingProduct.update({
-            Name,
-            CodeName,
-            SKUCode,
-            SKUFull,
-            SKUParent,
-            SKUCodeChild,
-            CompanyCode,
-            CategoryCode,
-            VariantId,
-            Content,
-            UoM,
-            Notes,
+            Name: Name ?? existingProduct.Name,
+            CodeName: CodeName ?? existingProduct.CodeName,
+            SKUCode: SKUCode ?? existingProduct.SKUCode,
+            SKUFull: SKUFull ?? existingProduct.SKUFull,
+            SKUParent: SKUParent ?? existingProduct.SKUParent,
+            SKUCodeChild: SKUCodeChild ?? existingProduct.SKUCodeChild,
+            CompanyCode: CompanyCode ?? existingProduct.CompanyCode,
+            CategoryCode: CategoryCode ?? existingProduct.CategoryCode,
+            VariantId: VariantId ?? existingProduct.VariantId,
+            Content: Content ?? existingProduct.Content,
+            UoM: UoM ?? existingProduct.UoM,
+            Notes: Notes ?? existingProduct.Notes,
             ImageURL: imageUrl,
-            Status,
+            Status: Status ?? existingProduct.Status,
             Length: dimensions.height, // Auto-fill Length
             Width: dimensions.width, // Auto-fill Width
             Height: dimensions.height, // Example: Setting Height equal to Length
-            Weight,
-            Parameter,
-            Keyword,
-            StoreName,
-            Channel: ChannelCode,
-            InitialChannel,
-            CategoryFromChannel,
-            CodeNumber,
-            SKUCodeEcommerce,
+            Weight: Weight ?? existingProduct.Weight,
+            Parameter: Parameter ?? existingProduct.Parameter,
+            Keyword: Keyword ?? existingProduct.Keyword,
+            StoreName: StoreName ?? existingProduct.StoreName,
+            Channel: ChannelCode ?? existingProduct.Channel,
+            InitialChannel: InitialChannel ?? existingProduct.InitialChannel,
+            CategoryFromChannel:
+                CategoryFromChannel ?? existingProduct.CategoryFromChannel,
+            CodeNumber: CodeNumber ?? existingProduct.CodeNumber,
+            SKUCodeEcommerce:
+                SKUCodeEcommerce ?? existingProduct.SKUCodeEcommerce,
         });
 
         res.status(200).json({

@@ -5,7 +5,19 @@ exports.createVariant = async (req, res) => {
     try {
         const { Name, Notes, Status } = req.body;
 
-        // Create the new Variant
+        // Check if a Variant with the same Name already exists
+        const existingVariant = await Variant.findOne({ where: { Name } });
+
+        if (existingVariant) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Variant with this name already exists",
+                },
+            });
+        }
+
+        // Create the new Variant if Name is unique
         const newVariant = await Variant.create({
             Name,
             Notes,
@@ -76,7 +88,28 @@ exports.updateVariant = async (req, res) => {
             });
         }
 
-        await variant.update({ Name, Notes, Status });
+        // Check if another Variant with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingVariant = await Variant.findOne({
+                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current variant
+            });
+
+            if (existingVariant) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Variant with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update Variant if Name is unique
+        await variant.update({
+            Name: Name ?? variant.Name,
+            Notes: Notes ?? variant.Notes,
+            Status: Status ?? variant.Status,
+        });
 
         return res.status(200).json({
             status: { code: 200, message: "Variant updated successfully" },

@@ -5,6 +5,19 @@ exports.createBank = async (req, res) => {
     try {
         const { Name, Notes, Status } = req.body;
 
+        // Check if a bank with the same Name already exists
+        const existingBank = await db.Bank.findOne({ where: { Name } });
+
+        if (existingBank) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Bank with this name already exists",
+                },
+            });
+        }
+
+        // Create new bank
         const newBank = await db.Bank.create({
             Name,
             Notes,
@@ -68,15 +81,36 @@ exports.updateBank = async (req, res) => {
         const { Code } = req.params;
         const { Name, Notes, Status } = req.body;
 
+        // Check if the bank exists
         const bank = await db.Bank.findByPk(Code);
-
         if (!bank) {
             return res.status(404).json({
                 status: { code: 404, message: "Bank not found" },
             });
         }
 
-        await bank.update({ Name, Notes, Status });
+        // Check if another bank with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingBank = await db.Bank.findOne({
+                where: { Name, Code: { [db.Sequelize.Op.ne]: Code } }, // Exclude the current bank
+            });
+
+            if (existingBank) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Bank with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update bank if Name is unique
+        await bank.update({
+            Name: Name ?? bank.Name,
+            Notes: Notes ?? bank.Notes,
+            Status: Status ?? bank.Status,
+        });
 
         res.status(200).json({
             status: { code: 200, message: "Bank updated successfully" },

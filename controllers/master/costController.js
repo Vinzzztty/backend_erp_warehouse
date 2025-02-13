@@ -5,6 +5,19 @@ exports.createCost = async (req, res) => {
     try {
         const { Name, Percentage, Note, Status } = req.body;
 
+        // Check if a cost with the same Name already exists
+        const existingCost = await db.Cost.findOne({ where: { Name } });
+
+        if (existingCost) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Cost with this name already exists",
+                },
+            });
+        }
+
+        // Create new cost if Name is unique
         const newCost = await db.Cost.create({
             Name,
             Percentage,
@@ -69,6 +82,7 @@ exports.updateCost = async (req, res) => {
         const { Code } = req.params;
         const { Name, Percentage, Note, Status } = req.body;
 
+        // Check if the cost exists
         const cost = await db.Cost.findByPk(Code);
 
         if (!cost) {
@@ -77,7 +91,26 @@ exports.updateCost = async (req, res) => {
             });
         }
 
-        await cost.update({ Name, Percentage, Note, Status });
+        // Check if another cost with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingCost = await db.Cost.findOne({
+                where: { Name, Code: { [db.Sequelize.Op.ne]: Code } }, // Exclude the current cost
+            });
+
+            if (existingCost) {
+                return res.status(400).json({
+                    status: { code: 400, message: "Cost with this name already exists" },
+                });
+            }
+        }
+
+        // Update cost if Name is unique
+        await cost.update({ 
+            Name: Name ?? cost.Name, 
+            Percentage: Percentage ?? cost.Percentage, 
+            Note: Note ?? cost.Note, 
+            Status: Status ?? cost.Status 
+        });
 
         res.status(200).json({
             status: { code: 200, message: "Cost updated successfully" },
@@ -89,6 +122,7 @@ exports.updateCost = async (req, res) => {
         });
     }
 };
+
 
 // Delete Cost
 exports.deleteCost = async (req, res) => {

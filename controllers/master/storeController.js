@@ -6,6 +6,19 @@ module.exports = {
         try {
             const { Name, Notes, Status } = req.body;
 
+            // Check if a store with the same Name already exists
+            const existingStore = await Store.findOne({ where: { Name } });
+
+            if (existingStore) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Store with this name already exists",
+                    },
+                });
+            }
+
+            // Create new store if Name is unique
             const newStore = await Store.create({
                 Name,
                 Notes,
@@ -70,18 +83,35 @@ module.exports = {
             const { Name, Notes, Status } = req.body;
             const { id } = req.params;
 
+            // Check if the store exists
             const store = await Store.findByPk(id);
-
             if (!store) {
                 return res.status(404).json({
                     status: { code: 404, message: "Store not found" },
                 });
             }
 
+            // Check if another store with the same Name exists (excluding the current one)
+            if (Name) {
+                const existingStore = await Store.findOne({
+                    where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current store
+                });
+
+                if (existingStore) {
+                    return res.status(400).json({
+                        status: {
+                            code: 400,
+                            message: "Store with this name already exists",
+                        },
+                    });
+                }
+            }
+
+            // Update store if Name is unique
             await store.update({
-                Name,
-                Notes,
-                Status,
+                Name: Name ?? store.Name,
+                Notes: Notes ?? store.Notes,
+                Status: Status ?? store.Status,
             });
 
             res.status(200).json({

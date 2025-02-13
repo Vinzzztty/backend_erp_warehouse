@@ -6,6 +6,19 @@ exports.createWarehouse = async (req, res) => {
     try {
         const { Name, Address, Notes, Status } = req.body;
 
+        // Check if a warehouse with the same Name already exists
+        const existingWarehouse = await Warehouse.findOne({ where: { Name } });
+
+        if (existingWarehouse) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Warehouse with this name already exists",
+                },
+            });
+        }
+
+        // Create new warehouse if Name is unique
         const newWarehouse = await Warehouse.create({
             Name,
             Address,
@@ -70,6 +83,7 @@ exports.updateWarehouse = async (req, res) => {
         const { id } = req.params;
         const { Name, Address, Notes, Status } = req.body;
 
+        // Check if the warehouse exists
         const warehouse = await Warehouse.findByPk(id);
 
         if (!warehouse) {
@@ -78,7 +92,29 @@ exports.updateWarehouse = async (req, res) => {
             });
         }
 
-        await warehouse.update({ Name, Address, Notes, Status });
+        // Check if another warehouse with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingWarehouse = await Warehouse.findOne({
+                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current warehouse
+            });
+
+            if (existingWarehouse) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Warehouse with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update warehouse if Name is unique
+        await warehouse.update({
+            Name: Name ?? warehouse.Name,
+            Address: Address ?? warehouse.Address,
+            Notes: Notes ?? warehouse.Notes,
+            Status: Status ?? warehouse.Status,
+        });
 
         res.status(200).json({
             status: { code: 200, message: "Warehouse updated successfully" },

@@ -5,6 +5,20 @@ const Country = db.Country;
 exports.createCountry = async (req, res) => {
     try {
         const { Name, Status } = req.body;
+
+        // Check if a country with the same Name already exists
+        const existingCountry = await Country.findOne({ where: { Name } });
+
+        if (existingCountry) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Country with this name already exists",
+                },
+            });
+        }
+
+        // Create new country if Name is unique
         const newCountry = await Country.create({ Name, Status });
 
         res.status(201).json({
@@ -62,6 +76,7 @@ exports.updateCountry = async (req, res) => {
         const { id } = req.params;
         const { Name, Status } = req.body;
 
+        // Check if the country exists
         const country = await Country.findByPk(id);
         if (!country) {
             return res.status(404).json({
@@ -69,9 +84,27 @@ exports.updateCountry = async (req, res) => {
             });
         }
 
-        country.Name = Name ?? country.Name;
-        country.Status = Status ?? country.Status;
-        await country.save();
+        // Check if another country with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingCountry = await Country.findOne({
+                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current country
+            });
+
+            if (existingCountry) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Country with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update country if Name is unique
+        await country.update({
+            Name: Name ?? country.Name,
+            Status: Status ?? country.Status,
+        });
 
         res.status(200).json({
             status: { code: 200, message: "Country updated successfully" },

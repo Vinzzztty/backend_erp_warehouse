@@ -5,14 +5,28 @@ exports.createCurrency = async (req, res) => {
     try {
         const { Code, Name, Notes, Status } = req.body;
 
-        const existingCurrency = await db.Currency.findByPk(Code);
-
-        if (existingCurrency) {
+        // Check if the currency Code already exists
+        const existingCurrencyByCode = await db.Currency.findByPk(Code);
+        if (existingCurrencyByCode) {
             return res.status(400).json({
                 status: { code: 400, message: "Currency code already exists" },
             });
         }
 
+        // Check if the currency Name already exists
+        const existingCurrencyByName = await db.Currency.findOne({
+            where: { Name },
+        });
+        if (existingCurrencyByName) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "Currency with this name already exists",
+                },
+            });
+        }
+
+        // Create new currency if both Code and Name are unique
         const newCurrency = await db.Currency.create({
             Code,
             Name,
@@ -77,15 +91,36 @@ exports.updateCurrency = async (req, res) => {
         const { Code } = req.params;
         const { Name, Notes, Status } = req.body;
 
+        // Check if the currency exists
         const currency = await db.Currency.findByPk(Code);
-
         if (!currency) {
             return res.status(404).json({
                 status: { code: 404, message: "Currency not found" },
             });
         }
 
-        await currency.update({ Name, Notes, Status });
+        // Check if another currency with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingCurrency = await db.Currency.findOne({
+                where: { Name, Code: { [db.Sequelize.Op.ne]: Code } }, // Exclude the current currency
+            });
+
+            if (existingCurrency) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Currency with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update currency if Name is unique
+        await currency.update({
+            Name: Name ?? currency.Name,
+            Notes: Notes ?? currency.Notes,
+            Status: Status ?? currency.Status,
+        });
 
         res.status(200).json({
             status: { code: 200, message: "Currency updated successfully" },

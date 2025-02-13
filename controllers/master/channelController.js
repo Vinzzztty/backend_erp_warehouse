@@ -6,6 +6,19 @@ module.exports = {
         try {
             const { Name, Initial, Category, Notes, Status } = req.body;
 
+            // Check if a channel with the same Name already exists
+            const existingChannel = await Channel.findOne({ where: { Name } });
+
+            if (existingChannel) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "Channel with this name already exists",
+                    },
+                });
+            }
+
+            // Create new channel if Name is unique
             const newChannel = await Channel.create({
                 Name,
                 Initial,
@@ -84,12 +97,29 @@ module.exports = {
                 });
             }
 
+            // Check if another channel with the same Name exists (excluding the current one)
+            if (Name) {
+                const existingChannel = await Channel.findOne({
+                    where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current channel
+                });
+
+                if (existingChannel) {
+                    return res.status(400).json({
+                        status: {
+                            code: 400,
+                            message: "Channel with this name already exists",
+                        },
+                    });
+                }
+            }
+
+            // Update channel if Name is unique
             await channel.update({
-                Name,
-                Initial,
-                Category,
-                Notes,
-                Status,
+                Name: Name ?? channel.Name,
+                Initial: Initial ?? channel.Initial,
+                Category: Category ?? channel.Category,
+                Notes: Notes ?? channel.Notes,
+                Status: Status ?? channel.Status,
             });
 
             res.status(200).json({

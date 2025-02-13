@@ -5,20 +5,36 @@ module.exports = {
     createCategory(req, res) {
         const { Name, SKUCode, Notes, Status } = req.body;
 
-        Category.create({
-            Name,
-            SKUCode,
-            Notes,
-            Status,
-        })
-            .then((newCategory) => {
-                res.status(201).json({
-                    status: {
-                        code: 201,
-                        message: "Category created successfully",
-                    },
-                    data: newCategory,
+        // Check if a category with the same Name already exists
+        Category.findOne({ where: { Name } })
+            .then((existingCategory) => {
+                if (existingCategory) {
+                    return res.status(400).json({
+                        status: {
+                            code: 400,
+                            message: "Category with this name already exists",
+                        },
+                    });
+                }
+
+                // Create new category if Name is unique
+                return Category.create({
+                    Name,
+                    SKUCode,
+                    Notes,
+                    Status,
                 });
+            })
+            .then((newCategory) => {
+                if (newCategory) {
+                    res.status(201).json({
+                        status: {
+                            code: 201,
+                            message: "Category created successfully",
+                        },
+                        data: newCategory,
+                    });
+                }
             })
             .catch((error) => {
                 res.status(500).json({
@@ -73,14 +89,43 @@ module.exports = {
     },
 
     // Update a Category by ID
+    // Update a Category by ID
     updateCategory(req, res) {
         const { id } = req.params;
         const { Name, SKUCode, Notes, Status } = req.body;
 
-        Category.update(
-            { Name, SKUCode, Notes, Status },
-            { where: { Code: id } }
-        )
+        // Check if the category exists
+        Category.findByPk(id)
+            .then(async (category) => {
+                if (!category) {
+                    return res.status(404).json({
+                        status: { code: 404, message: "Category not found" },
+                    });
+                }
+
+                // Check if another category with the same Name exists (excluding the current one)
+                if (Name) {
+                    const existingCategory = await Category.findOne({
+                        where: { Name, Code: { [db.Sequelize.Op.ne]: id } }, // Exclude the current category
+                    });
+
+                    if (existingCategory) {
+                        return res.status(400).json({
+                            status: {
+                                code: 400,
+                                message:
+                                    "Category with this name already exists",
+                            },
+                        });
+                    }
+                }
+
+                // Update category if Name is unique
+                return Category.update(
+                    { Name, SKUCode, Notes, Status },
+                    { where: { Code: id } }
+                );
+            })
             .then((updated) => {
                 if (updated[0] === 0) {
                     return res.status(404).json({

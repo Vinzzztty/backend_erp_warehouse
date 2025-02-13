@@ -6,13 +6,25 @@ exports.createUoM = async (req, res) => {
         const { Code, Name, Notes, Status } = req.body;
 
         // Check if a UoM with the same Code already exists
-        const existingUoM = await UoM.findByPk(Code);
-        if (existingUoM) {
+        const existingUoMByCode = await UoM.findByPk(Code);
+        if (existingUoMByCode) {
             return res.status(400).json({
                 status: { code: 400, message: "UoM code already exists" },
             });
         }
 
+        // Check if a UoM with the same Name already exists
+        const existingUoMByName = await UoM.findOne({ where: { Name } });
+        if (existingUoMByName) {
+            return res.status(400).json({
+                status: {
+                    code: 400,
+                    message: "UoM with this name already exists",
+                },
+            });
+        }
+
+        // Create new UoM if both Code and Name are unique
         const newUoM = await UoM.create({
             Code,
             Name,
@@ -75,6 +87,7 @@ exports.updateUoM = async (req, res) => {
         const { code } = req.params;
         const { Name, Notes, Status } = req.body;
 
+        // Check if the UoM exists
         const uom = await UoM.findByPk(code);
         if (!uom) {
             return res.status(404).json({
@@ -82,7 +95,29 @@ exports.updateUoM = async (req, res) => {
             });
         }
 
-        await uom.update({ Name, Notes, Status });
+        // Check if another UoM with the same Name exists (excluding the current one)
+        if (Name) {
+            const existingUoM = await UoM.findOne({
+                where: { Name, Code: { [db.Sequelize.Op.ne]: code } }, // Exclude the current UoM
+            });
+
+            if (existingUoM) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "UoM with this name already exists",
+                    },
+                });
+            }
+        }
+
+        // Update UoM if Name is unique
+        await uom.update({
+            Name: Name ?? uom.Name,
+            Notes: Notes ?? uom.Notes,
+            Status: Status ?? uom.Status,
+        });
+
         res.status(200).json({
             status: { code: 200, message: "UoM updated successfully" },
             data: uom,
