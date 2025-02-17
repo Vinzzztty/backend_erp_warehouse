@@ -1,6 +1,6 @@
+const db = require("../../models");
 const { UoM } = require("../../models");
 const { Op } = db.Sequelize;
-const db = require("../../models");
 
 // Create a new UoM
 exports.createUoM = async (req, res) => {
