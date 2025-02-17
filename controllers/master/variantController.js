@@ -1,4 +1,5 @@
 const { Variant } = require("../../models");
+const { Op } = db.Sequelize;
 
 // Create a new Variant
 exports.createVariant = async (req, res) => {
@@ -77,21 +78,32 @@ exports.getVariantById = async (req, res) => {
 // Update a Variant
 exports.updateVariant = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' from request params
         const { Name, Notes, Status } = req.body;
 
-        // Check if the Variant exists
-        const variant = await Variant.findByPk(id);
+        // Convert id to integer since 'Code' is an integer
+        const variantCode = parseInt(id, 10);
+        if (isNaN(variantCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid variant Code" },
+            });
+        }
+
+        // Find variant using the correct primary key ('Code')
+        const variant = await Variant.findByPk(variantCode);
         if (!variant) {
             return res.status(404).json({
                 status: { code: 404, message: "Variant not found" },
             });
         }
 
-        // Check if another Variant with the same Name exists (excluding the current one)
+        // Check for duplicate variant name (excluding the current variant)
         if (Name) {
             const existingVariant = await Variant.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current variant
+                where: {
+                    Name,
+                    Code: { [Op.ne]: variantCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingVariant) {
@@ -104,7 +116,7 @@ exports.updateVariant = async (req, res) => {
             }
         }
 
-        // Update Variant if Name is unique
+        // Update the variant
         await variant.update({
             Name: Name ?? variant.Name,
             Notes: Notes ?? variant.Notes,
@@ -116,6 +128,7 @@ exports.updateVariant = async (req, res) => {
             data: variant,
         });
     } catch (error) {
+        console.error("Error updating variant:", error);
         return res.status(500).json({
             status: { code: 500, message: error.message },
         });

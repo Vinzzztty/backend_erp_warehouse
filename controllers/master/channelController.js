@@ -1,4 +1,5 @@
 const { Channel } = require("../../models");
+const { Op } = db.Sequelize;
 
 module.exports = {
     // Create a new channel
@@ -89,18 +90,29 @@ module.exports = {
             const { id } = req.params;
             const { Name, Initial, Category, Notes, Status } = req.body;
 
-            const channel = await Channel.findByPk(id);
+            const channelCode = parseInt(id, 10);
 
+            if (isNaN(channelCode)) {
+                return res.status(400).json({
+                    status: { code: 400, message: "Invalid channel Code" },
+                });
+            }
+
+            // Find channel using the correct primary key ('Code')
+            const channel = await Channel.findByPk(channelCode);
             if (!channel) {
                 return res.status(404).json({
                     status: { code: 404, message: "Channel not found" },
                 });
             }
 
-            // Check if another channel with the same Name exists (excluding the current one)
+            // Check for duplicate channel name (excluding the current channel)
             if (Name) {
                 const existingChannel = await Channel.findOne({
-                    where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current channel
+                    where: {
+                        Name,
+                        Code: { [Op.ne]: channelCode }, // Use 'Code' instead of 'id'
+                    },
                 });
 
                 if (existingChannel) {
@@ -113,7 +125,7 @@ module.exports = {
                 }
             }
 
-            // Update channel if Name is unique
+            // Update the channel
             await channel.update({
                 Name: Name ?? channel.Name,
                 Initial: Initial ?? channel.Initial,

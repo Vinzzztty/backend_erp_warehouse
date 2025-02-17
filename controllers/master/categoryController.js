@@ -1,4 +1,5 @@
 const Category = require("../../models").Category;
+const { Op } = db.Sequelize;
 
 module.exports = {
     // Create a new Category
@@ -89,61 +90,64 @@ module.exports = {
     },
 
     // Update a Category by ID
-    // Update a Category by ID
-    updateCategory(req, res) {
-        const { id } = req.params;
-        const { Name, SKUCode, Notes, Status } = req.body;
+    updateCategory: async (req, res) => {
+        try {
+            const { id } = req.params; // This should be 'Code' from request params
+            const { Name, SKUCode, Notes, Status } = req.body;
 
-        // Check if the category exists
-        Category.findByPk(id)
-            .then(async (category) => {
-                if (!category) {
-                    return res.status(404).json({
-                        status: { code: 404, message: "Category not found" },
-                    });
-                }
+            // Convert id to integer since 'Code' is an integer
+            const categoryCode = parseInt(id, 10);
+            if (isNaN(categoryCode)) {
+                return res.status(400).json({
+                    status: { code: 400, message: "Invalid category Code" },
+                });
+            }
 
-                // Check if another category with the same Name exists (excluding the current one)
-                if (Name) {
-                    const existingCategory = await Category.findOne({
-                        where: { Name, Code: { [db.Sequelize.Op.ne]: id } }, // Exclude the current category
-                    });
+            // Find category using the correct primary key ('Code')
+            const category = await Category.findByPk(categoryCode);
+            if (!category) {
+                return res.status(404).json({
+                    status: { code: 404, message: "Category not found" },
+                });
+            }
 
-                    if (existingCategory) {
-                        return res.status(400).json({
-                            status: {
-                                code: 400,
-                                message:
-                                    "Category with this name already exists",
-                            },
-                        });
-                    }
-                }
-
-                // Update category if Name is unique
-                return Category.update(
-                    { Name, SKUCode, Notes, Status },
-                    { where: { Code: id } }
-                );
-            })
-            .then((updated) => {
-                if (updated[0] === 0) {
-                    return res.status(404).json({
-                        status: { code: 404, message: "Category not found" },
-                    });
-                }
-                res.status(200).json({
-                    status: {
-                        code: 200,
-                        message: "Category updated successfully",
+            // Check for duplicate category name (excluding the current category)
+            if (Name) {
+                const existingCategory = await Category.findOne({
+                    where: {
+                        Name,
+                        Code: { [Op.ne]: categoryCode }, // Use 'Code' instead of 'id'
                     },
                 });
-            })
-            .catch((error) => {
-                res.status(500).json({
-                    status: { code: 500, message: error.message },
-                });
+
+                if (existingCategory) {
+                    return res.status(400).json({
+                        status: {
+                            code: 400,
+                            message: "Category with this name already exists",
+                        },
+                    });
+                }
+            }
+
+            // Update the category
+            await category.update({
+                Name: Name ?? category.Name,
+                SKUCode: SKUCode ?? category.SKUCode,
+                Notes: Notes ?? category.Notes,
+                Status: Status ?? category.Status,
             });
+
+            res.status(200).json({
+                status: { code: 200, message: "Category updated successfully" },
+                data: category,
+            });
+        } catch (error) {
+            console.error("Error updating category:", error);
+            res.status(500).json({
+                status: { code: 500, message: error.message },
+            });
+        }
     },
 
     // Delete a Category by ID

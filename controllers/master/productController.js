@@ -1,5 +1,6 @@
 const ImageKit = require("imagekit");
 const sharp = require("sharp");
+const { Op } = db.Sequelize;
 
 // ImageKit setup
 const imagekit = new ImageKit({
@@ -200,10 +201,18 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' from request params
+
+        // Convert id to integer since 'Code' is an integer
+        const productCode = parseInt(id, 10);
+        if (isNaN(productCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid product Code" },
+            });
+        }
 
         // Check if the product exists
-        const existingProduct = await Product.findByPk(id);
+        const existingProduct = await Product.findByPk(productCode);
         if (!existingProduct) {
             return res.status(404).json({
                 status: { code: 404, message: "Product not found" },
@@ -241,7 +250,10 @@ exports.updateProduct = async (req, res) => {
         // Check if another product with the same Name exists (excluding the current one)
         if (Name) {
             const existingProductByName = await Product.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current product
+                where: {
+                    Name,
+                    Code: { [Op.ne]: productCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingProductByName) {
@@ -260,6 +272,7 @@ exports.updateProduct = async (req, res) => {
             width: existingProduct.Width,
             height: existingProduct.Height,
         };
+
         if (req.file) {
             imageUrl = await uploadImageToImageKit(
                 req.file.buffer,
@@ -306,9 +319,9 @@ exports.updateProduct = async (req, res) => {
             Notes: Notes ?? existingProduct.Notes,
             ImageURL: imageUrl,
             Status: Status ?? existingProduct.Status,
-            Length: dimensions.height, // Auto-fill Length
-            Width: dimensions.width, // Auto-fill Width
-            Height: dimensions.height, // Example: Setting Height equal to Length
+            Length: Length ?? dimensions.height, // Auto-fill Length if not provided
+            Width: Width ?? dimensions.width, // Auto-fill Width if not provided
+            Height: Height ?? existingProduct.Height, // Keep the original if not updated
             Weight: Weight ?? existingProduct.Weight,
             Parameter: Parameter ?? existingProduct.Parameter,
             Keyword: Keyword ?? existingProduct.Keyword,
@@ -327,6 +340,7 @@ exports.updateProduct = async (req, res) => {
             data: existingProduct,
         });
     } catch (error) {
+        console.error("Error updating product:", error);
         res.status(500).json({
             status: { code: 500, message: error.message },
         });

@@ -1,4 +1,5 @@
 const { UoM } = require("../../models");
+const { Op } = db.Sequelize;
 
 // Create a new UoM
 exports.createUoM = async (req, res) => {
@@ -87,18 +88,29 @@ exports.updateUoM = async (req, res) => {
         const { code } = req.params;
         const { Name, Notes, Status } = req.body;
 
-        // Check if the UoM exists
-        const uom = await UoM.findByPk(code);
+        // Convert code to integer since 'Code' is an integer
+        const uomCode = parseInt(code, 10);
+        if (isNaN(uomCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid UoM Code" },
+            });
+        }
+
+        // Find UoM using the correct primary key ('Code')
+        const uom = await UoM.findByPk(uomCode);
         if (!uom) {
             return res.status(404).json({
                 status: { code: 404, message: "UoM not found" },
             });
         }
 
-        // Check if another UoM with the same Name exists (excluding the current one)
+        // Check for duplicate UoM name (excluding the current UoM)
         if (Name) {
             const existingUoM = await UoM.findOne({
-                where: { Name, Code: { [db.Sequelize.Op.ne]: code } }, // Exclude the current UoM
+                where: {
+                    Name,
+                    Code: { [Op.ne]: uomCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingUoM) {
@@ -111,7 +123,7 @@ exports.updateUoM = async (req, res) => {
             }
         }
 
-        // Update UoM if Name is unique
+        // Update the UoM
         await uom.update({
             Name: Name ?? uom.Name,
             Notes: Notes ?? uom.Notes,
@@ -123,6 +135,7 @@ exports.updateUoM = async (req, res) => {
             data: uom,
         });
     } catch (error) {
+        console.error("Error updating UoM:", error);
         res.status(500).json({
             status: { code: 500, message: error.message },
         });
