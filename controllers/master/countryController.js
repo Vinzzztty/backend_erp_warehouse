@@ -1,5 +1,6 @@
 const db = require("../../models");
 const Country = db.Country;
+const { Op } = db.Sequelize; // Import Sequelize operators
 
 // Create a new country
 exports.createCountry = async (req, res) => {
@@ -76,8 +77,16 @@ exports.updateCountry = async (req, res) => {
         const { id } = req.params;
         const { Name, Status } = req.body;
 
+        // Ensure ID is a valid integer (if applicable)
+        const countryId = parseInt(id, 10);
+        if (isNaN(countryId)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid country ID" },
+            });
+        }
+
         // Check if the country exists
-        const country = await Country.findByPk(id);
+        const country = await Country.findByPk(countryId);
         if (!country) {
             return res.status(404).json({
                 status: { code: 404, message: "Country not found" },
@@ -87,7 +96,10 @@ exports.updateCountry = async (req, res) => {
         // Check if another country with the same Name exists (excluding the current one)
         if (Name) {
             const existingCountry = await Country.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current country
+                where: {
+                    Name,
+                    id: { [Op.ne]: countryId }, // Ensure the correct primary key column is used
+                },
             });
 
             if (existingCountry) {
@@ -111,6 +123,7 @@ exports.updateCountry = async (req, res) => {
             data: country,
         });
     } catch (error) {
+        console.error("Error updating country:", error);
         res.status(500).json({
             status: { code: 500, message: error.message },
         });
