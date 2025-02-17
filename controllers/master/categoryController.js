@@ -1,6 +1,6 @@
-const Category = require("../../models").Category;
+const db = require("../../models"); // Ensure db is defined first
+const { Category } = db;
 const { Op } = db.Sequelize;
-const db = require("../../models");
 
 module.exports = {
     // Create a new Category
