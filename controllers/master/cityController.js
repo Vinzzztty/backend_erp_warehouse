@@ -2,6 +2,7 @@ const db = require("../../models");
 const City = db.City;
 const Province = db.Province;
 const Country = db.Country;
+const { Op } = db.Sequelize;
 
 // Create a new city
 exports.createCity = async (req, res) => {
@@ -82,22 +83,34 @@ exports.getCityById = async (req, res) => {
     }
 };
 
-// Update a city by ID
 exports.updateCity = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' from request params
         const { Name, ProvinceId, CountryId, Status } = req.body;
 
-        const city = await City.findByPk(id);
+        // Convert id to integer since 'Code' is an integer
+        const cityCode = parseInt(id, 10);
+        if (isNaN(cityCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid city Code" },
+            });
+        }
+
+        // Find city using the correct primary key ('Code')
+        const city = await City.findByPk(cityCode);
         if (!city) {
-            return res.status(404).json({ error: "City not found" });
+            return res.status(404).json({
+                status: { code: 404, message: "City not found" },
+            });
         }
 
         // Check if ProvinceId exists
         if (ProvinceId) {
             const provinceExists = await Province.findByPk(ProvinceId);
             if (!provinceExists) {
-                return res.status(404).json({ error: "Province not found" });
+                return res.status(404).json({
+                    status: { code: 404, message: "Province not found" },
+                });
             }
         }
 
@@ -105,14 +118,19 @@ exports.updateCity = async (req, res) => {
         if (CountryId) {
             const countryExists = await Country.findByPk(CountryId);
             if (!countryExists) {
-                return res.status(404).json({ error: "Country not found" });
+                return res.status(404).json({
+                    status: { code: 404, message: "Country not found" },
+                });
             }
         }
 
-        // Check if another city with the same Name exists (excluding the current city)
+        // Check for duplicate city name (excluding the current city)
         if (Name) {
             const existingCity = await City.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current city
+                where: {
+                    Name,
+                    Code: { [Op.ne]: cityCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingCity) {
@@ -125,19 +143,23 @@ exports.updateCity = async (req, res) => {
             }
         }
 
-        // Update city if Name is unique
-        city.Name = Name ?? city.Name;
-        city.ProvinceId = ProvinceId ?? city.ProvinceId;
-        city.CountryId = CountryId ?? city.CountryId;
-        city.Status = Status ?? city.Status;
-        await city.save();
+        // Update the city
+        await city.update({
+            Name: Name ?? city.Name,
+            ProvinceId: ProvinceId ?? city.ProvinceId,
+            CountryId: CountryId ?? city.CountryId,
+            Status: Status ?? city.Status,
+        });
 
         res.status(200).json({
             status: { code: 200, message: "City updated successfully" },
             data: city,
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error updating city:", error);
+        res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
     }
 };
 

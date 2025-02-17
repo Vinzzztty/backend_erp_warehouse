@@ -1,6 +1,7 @@
 const db = require("../../models");
 const Province = db.Province;
 const Country = db.Country;
+const { Op } = db.Sequelize;
 
 // Create a new province
 exports.createProvince = async (req, res) => {
@@ -66,24 +67,34 @@ exports.getProvinceById = async (req, res) => {
     }
 };
 
-// Update a province by ID
 exports.updateProvince = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' from request params
         const { Name, CountryId, Status } = req.body;
 
-        // Check if the province exists
-        const province = await Province.findByPk(id);
+        // Convert id to integer since 'Code' is an integer
+        const provinceCode = parseInt(id, 10);
+        if (isNaN(provinceCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid province Code" },
+            });
+        }
+
+        // Find province using the correct primary key ('Code')
+        const province = await Province.findByPk(provinceCode);
         if (!province) {
             return res.status(404).json({
                 status: { code: 404, message: "Province not found" },
             });
         }
 
-        // Check if another province with the same Name exists (excluding the current one)
+        // Check for duplicate province name (excluding the current province)
         if (Name) {
             const existingProvince = await Province.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current province
+                where: {
+                    Name,
+                    Code: { [Op.ne]: provinceCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingProvince) {
@@ -106,7 +117,7 @@ exports.updateProvince = async (req, res) => {
             }
         }
 
-        // Update province if Name is unique
+        // Update the province
         await province.update({
             Name: Name ?? province.Name,
             CountryId: CountryId ?? province.CountryId,
@@ -118,7 +129,10 @@ exports.updateProvince = async (req, res) => {
             data: province,
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error updating province:", error);
+        res.status(500).json({
+            status: { code: 500, message: error.message },
+        });
     }
 };
 
