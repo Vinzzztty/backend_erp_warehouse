@@ -23,7 +23,6 @@ const uploadImageToImageKit = async (fileBuffer, fileName) => {
     }
 };
 
-const db = require("../../models");
 const Product = db.Product;
 
 // The associated models

@@ -1,5 +1,5 @@
 const db = require("../../models");
-const { Variant } = require("../../models");
+const { Variant } = db.Variant;
 const { Op } = db.Sequelize;
 
 // Create a new Variant
