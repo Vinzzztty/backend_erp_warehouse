@@ -1,4 +1,5 @@
 const { Store } = require("../../models");
+const db = require("../../models");
 
 module.exports = {
     // Create Store

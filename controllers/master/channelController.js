@@ -1,5 +1,6 @@
 const { Channel } = require("../../models");
 const { Op } = db.Sequelize;
+const db = require("../../models");
 
 module.exports = {
     // Create a new channel

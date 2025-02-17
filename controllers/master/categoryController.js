@@ -1,5 +1,6 @@
 const Category = require("../../models").Category;
 const { Op } = db.Sequelize;
+const db = require("../../models");
 
 module.exports = {
     // Create a new Category

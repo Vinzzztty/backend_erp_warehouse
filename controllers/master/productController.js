@@ -1,6 +1,7 @@
 const ImageKit = require("imagekit");
 const sharp = require("sharp");
 const { Op } = db.Sequelize;
+const db = require("../../models");
 
 // ImageKit setup
 const imagekit = new ImageKit({

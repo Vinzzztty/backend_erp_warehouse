@@ -1,4 +1,5 @@
 const { Supplier, City, Province, Country, Bank } = require("../../models");
+const db = require("../../models");
 
 // Create a new supplier
 exports.createSupplier = async (req, res) => {

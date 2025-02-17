@@ -1,5 +1,6 @@
 const db = require("../../models");
 
+
 // Create PPN Setting
 exports.createPPNSetting = async (req, res) => {
     try {

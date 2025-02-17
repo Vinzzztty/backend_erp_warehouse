@@ -1,5 +1,6 @@
 const { Variant } = require("../../models");
 const { Op } = db.Sequelize;
+const db = require("../../models");
 
 // Create a new Variant
 exports.createVariant = async (req, res) => {

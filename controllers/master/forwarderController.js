@@ -1,4 +1,5 @@
 const { Forwarder, Country, Bank } = require("../../models");
+const db = require("../../models");
 
 // Create a new forwarder
 exports.createForwarder = async (req, res) => {
