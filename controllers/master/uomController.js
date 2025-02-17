@@ -1,5 +1,5 @@
 const db = require("../../models");
-const { UoM } = db.UoM;
+const { UoM } = require("../../models");
 const { Op } = db.Sequelize;
 
 // Create a new UoM
