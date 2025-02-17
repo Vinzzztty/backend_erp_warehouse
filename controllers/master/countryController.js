@@ -74,31 +74,31 @@ exports.getCountryById = async (req, res) => {
 // Update a country by ID
 exports.updateCountry = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' from request params
         const { Name, Status } = req.body;
 
-        // Ensure ID is a valid integer (if applicable)
-        const countryId = parseInt(id, 10);
-        if (isNaN(countryId)) {
+        // Convert id to integer since 'Code' is an integer
+        const countryCode = parseInt(id, 10);
+        if (isNaN(countryCode)) {
             return res.status(400).json({
-                status: { code: 400, message: "Invalid country ID" },
+                status: { code: 400, message: "Invalid country Code" },
             });
         }
 
-        // Check if the country exists
-        const country = await Country.findByPk(countryId);
+        // Find country using the correct primary key ('Code')
+        const country = await Country.findByPk(countryCode);
         if (!country) {
             return res.status(404).json({
                 status: { code: 404, message: "Country not found" },
             });
         }
 
-        // Check if another country with the same Name exists (excluding the current one)
+        // Check for duplicate country name (excluding the current country)
         if (Name) {
             const existingCountry = await Country.findOne({
                 where: {
                     Name,
-                    id: { [Op.ne]: countryId }, // Ensure the correct primary key column is used
+                    Code: { [Op.ne]: countryCode }, // Use 'Code' instead of 'id'
                 },
             });
 
@@ -112,7 +112,7 @@ exports.updateCountry = async (req, res) => {
             }
         }
 
-        // Update country if Name is unique
+        // Update the country
         await country.update({
             Name: Name ?? country.Name,
             Status: Status ?? country.Status,
