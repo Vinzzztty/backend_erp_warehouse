@@ -1,5 +1,4 @@
 const db = require("../../models");
-const db = require("../../models");
 
 // Create Currency
 exports.createCurrency = async (req, res) => {
