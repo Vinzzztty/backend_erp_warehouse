@@ -83,22 +83,13 @@ exports.getUoMByCode = async (req, res) => {
     }
 };
 
-// Update UoM
 exports.updateUoM = async (req, res) => {
     try {
-        const { code } = req.params;
+        const { code } = req.params; // No need to parse as an integer since it's a string
         const { Name, Notes, Status } = req.body;
 
-        // Convert code to integer since 'Code' is an integer
-        const uomCode = parseInt(code, 10);
-        if (isNaN(uomCode)) {
-            return res.status(400).json({
-                status: { code: 400, message: "Invalid UoM Code" },
-            });
-        }
-
-        // Find UoM using the correct primary key ('Code')
-        const uom = await UoM.findByPk(uomCode);
+        // Find UoM using the correct primary key ('Code' as a string)
+        const uom = await UoM.findByPk(code);
         if (!uom) {
             return res.status(404).json({
                 status: { code: 404, message: "UoM not found" },
@@ -110,7 +101,7 @@ exports.updateUoM = async (req, res) => {
             const existingUoM = await UoM.findOne({
                 where: {
                     Name,
-                    Code: { [Op.ne]: uomCode }, // Use 'Code' instead of 'id'
+                    Code: { [Op.ne]: code }, // Use 'Code' as a string
                 },
             });
 
