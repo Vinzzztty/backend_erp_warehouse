@@ -2,23 +2,29 @@ module.exports = (sequelize, DataTypes) => {
     const PPNSetting = sequelize.define(
         "PPNSetting",
         {
+            Code: {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
+                allowNull: false,
+            },
             Name: {
-                type: DataTypes.STRING(100), // Free text input
+                type: DataTypes.STRING(100),
                 allowNull: false,
             },
             Rate: {
-                type: DataTypes.DECIMAL(5, 2), // Decimal with up to 2 decimal places
+                type: DataTypes.DECIMAL(5, 2),
                 allowNull: false,
             },
             Status: {
-                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
+                type: DataTypes.ENUM("Active", "Non-Active"),
                 allowNull: false,
-                defaultValue: "Active", // Default value for new entries
+                defaultValue: "Active",
             },
         },
         {
-            timestamps: true, // Automatically adds createdAt and updatedAt fields
-            tableName: "PPNSetting", // Explicit table name
+            timestamps: true,
+            tableName: "PPNSetting",
         }
     );
 

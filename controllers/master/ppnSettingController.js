@@ -1,5 +1,6 @@
 const db = require("../../models");
-
+const { PPNSetting } = db;
+const { Op } = db.Sequelize;
 
 // Create PPN Setting
 exports.createPPNSetting = async (req, res) => {
@@ -57,13 +58,20 @@ exports.getAllPPNSettings = async (req, res) => {
     }
 };
 
-// Get PPN Setting by ID
+// Get PPN Setting by Code
 exports.getPPNSettingById = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' now
 
-        const ppnSetting = await db.PPNSetting.findByPk(id);
+        // Convert id to integer since 'Code' is an integer
+        const ppnCode = parseInt(id, 10);
+        if (isNaN(ppnCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid PPN Setting Code" },
+            });
+        }
 
+        const ppnSetting = await PPNSetting.findByPk(ppnCode);
         if (!ppnSetting) {
             return res.status(404).json({
                 status: { code: 404, message: "PPN Setting not found" },
@@ -84,14 +92,22 @@ exports.getPPNSettingById = async (req, res) => {
     }
 };
 
-// Update PPN Setting
+// Update PPN Setting by Code
 exports.updatePPNSetting = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' now
         const { Name, Rate, Status } = req.body;
 
+        // Convert id to integer since 'Code' is an integer
+        const ppnCode = parseInt(id, 10);
+        if (isNaN(ppnCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid PPN Setting Code" },
+            });
+        }
+
         // Check if the PPN Setting exists
-        const ppnSetting = await db.PPNSetting.findByPk(id);
+        const ppnSetting = await PPNSetting.findByPk(ppnCode);
         if (!ppnSetting) {
             return res.status(404).json({
                 status: { code: 404, message: "PPN Setting not found" },
@@ -100,8 +116,11 @@ exports.updatePPNSetting = async (req, res) => {
 
         // Check if another PPN Setting with the same Name exists (excluding the current one)
         if (Name) {
-            const existingPPNSetting = await db.PPNSetting.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current PPN setting
+            const existingPPNSetting = await PPNSetting.findOne({
+                where: {
+                    Name,
+                    Code: { [Op.ne]: ppnCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingPPNSetting) {
@@ -114,7 +133,7 @@ exports.updatePPNSetting = async (req, res) => {
             }
         }
 
-        // Update PPN Setting if Name is unique
+        // Update the PPN Setting
         await ppnSetting.update({
             Name: Name ?? ppnSetting.Name,
             Rate: Rate ?? ppnSetting.Rate,
