@@ -1,5 +1,6 @@
-const { Supplier, City, Province, Country, Bank } = require("../../models");
 const db = require("../../models");
+const { Supplier, City, Province, Country, Bank } = db;
+const { Op } = db.Sequelize;
 
 // Create a new supplier
 exports.createSupplier = async (req, res) => {
@@ -175,7 +176,7 @@ exports.getSupplierById = async (req, res) => {
 // Update supplier by ID
 exports.updateSupplier = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' now
         const {
             Name,
             Address,
@@ -195,8 +196,16 @@ exports.updateSupplier = async (req, res) => {
             ShippingMark,
         } = req.body;
 
+        // Convert id to integer since 'Code' is an integer
+        const supplierCode = parseInt(id, 10);
+        if (isNaN(supplierCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid supplier Code" },
+            });
+        }
+
         // Check if the supplier exists
-        const supplier = await Supplier.findByPk(id);
+        const supplier = await Supplier.findByPk(supplierCode);
         if (!supplier) {
             return res.status(404).json({
                 status: { code: 404, message: "Supplier not found" },
@@ -206,7 +215,10 @@ exports.updateSupplier = async (req, res) => {
         // Check if another supplier with the same Name exists (excluding the current one)
         if (Name) {
             const existingSupplier = await Supplier.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current supplier
+                where: {
+                    Name,
+                    Code: { [Op.ne]: supplierCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingSupplier) {
@@ -281,6 +293,7 @@ exports.updateSupplier = async (req, res) => {
             data: supplier,
         });
     } catch (error) {
+        console.error("Error updating supplier:", error);
         res.status(500).json({
             status: { code: 500, message: "Internal server error" },
             error: error.message,

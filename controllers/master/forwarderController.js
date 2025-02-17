@@ -1,5 +1,6 @@
-const { Forwarder, Country, Bank } = require("../../models");
 const db = require("../../models");
+const { Forwarder, Country, Bank } = db;
+const { Op } = db.Sequelize;
 
 // Create a new forwarder
 exports.createForwarder = async (req, res) => {
@@ -136,10 +137,18 @@ exports.updateForwarder = async (req, res) => {
             ShippingMark,
             Status,
         } = req.body;
-        const { id } = req.params;
+        const { id } = req.params; // This should be 'Code' now
+
+        // Convert id to integer since 'Code' is an integer
+        const forwarderCode = parseInt(id, 10);
+        if (isNaN(forwarderCode)) {
+            return res.status(400).json({
+                status: { code: 400, message: "Invalid forwarder Code" },
+            });
+        }
 
         // Check if the forwarder exists
-        const forwarder = await Forwarder.findByPk(id);
+        const forwarder = await Forwarder.findByPk(forwarderCode);
         if (!forwarder) {
             return res.status(404).json({
                 status: { code: 404, message: "Forwarder not found" },
@@ -149,7 +158,10 @@ exports.updateForwarder = async (req, res) => {
         // Check if another forwarder with the same Name exists (excluding the current one)
         if (Name) {
             const existingForwarder = await Forwarder.findOne({
-                where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current forwarder
+                where: {
+                    Name,
+                    Code: { [Op.ne]: forwarderCode }, // Use 'Code' instead of 'id'
+                },
             });
 
             if (existingForwarder) {
@@ -206,6 +218,7 @@ exports.updateForwarder = async (req, res) => {
             data: forwarder,
         });
     } catch (error) {
+        console.error("Error updating forwarder:", error);
         res.status(500).json({
             status: { code: 500, message: "Internal server error" },
             error: error.message,

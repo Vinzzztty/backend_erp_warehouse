@@ -1,5 +1,6 @@
-const { Store } = require("../../models");
 const db = require("../../models");
+const { Store } = db;
+const { Op } = db.Sequelize;
 
 module.exports = {
     // Create Store
@@ -82,10 +83,18 @@ module.exports = {
     updateStore: async (req, res) => {
         try {
             const { Name, Notes, Status } = req.body;
-            const { id } = req.params;
+            const { id } = req.params; // This should be 'Code' now
+
+            // Convert id to integer since 'Code' is an integer
+            const storeCode = parseInt(id, 10);
+            if (isNaN(storeCode)) {
+                return res.status(400).json({
+                    status: { code: 400, message: "Invalid store Code" },
+                });
+            }
 
             // Check if the store exists
-            const store = await Store.findByPk(id);
+            const store = await Store.findByPk(storeCode);
             if (!store) {
                 return res.status(404).json({
                     status: { code: 404, message: "Store not found" },
@@ -95,7 +104,10 @@ module.exports = {
             // Check if another store with the same Name exists (excluding the current one)
             if (Name) {
                 const existingStore = await Store.findOne({
-                    where: { Name, id: { [db.Sequelize.Op.ne]: id } }, // Exclude the current store
+                    where: {
+                        Name,
+                        Code: { [Op.ne]: storeCode }, // Use 'Code' instead of 'id'
+                    },
                 });
 
                 if (existingStore) {
@@ -108,7 +120,7 @@ module.exports = {
                 }
             }
 
-            // Update store if Name is unique
+            // Update store
             await store.update({
                 Name: Name ?? store.Name,
                 Notes: Notes ?? store.Notes,
