@@ -58,20 +58,20 @@ exports.getAllPPNSettings = async (req, res) => {
     }
 };
 
-// Get PPN Setting by Code
+// Get PPN Setting by ID
 exports.getPPNSettingById = async (req, res) => {
     try {
-        const { id } = req.params; // This should be 'Code' now
+        const { id } = req.params; // Keep using 'id'
 
-        // Convert id to integer since 'Code' is an integer
-        const ppnCode = parseInt(id, 10);
-        if (isNaN(ppnCode)) {
+        // Convert id to integer since it's an auto-increment integer
+        const ppnId = parseInt(id, 10);
+        if (isNaN(ppnId)) {
             return res.status(400).json({
-                status: { code: 400, message: "Invalid PPN Setting Code" },
+                status: { code: 400, message: "Invalid PPN Setting ID" },
             });
         }
 
-        const ppnSetting = await PPNSetting.findByPk(ppnCode);
+        const ppnSetting = await PPNSetting.findByPk(ppnId);
         if (!ppnSetting) {
             return res.status(404).json({
                 status: { code: 404, message: "PPN Setting not found" },
@@ -92,22 +92,22 @@ exports.getPPNSettingById = async (req, res) => {
     }
 };
 
-// Update PPN Setting by Code
+// Update PPN Setting
 exports.updatePPNSetting = async (req, res) => {
     try {
-        const { id } = req.params; // This should be 'Code' now
+        const { id } = req.params;
         const { Name, Rate, Status } = req.body;
 
-        // Convert id to integer since 'Code' is an integer
-        const ppnCode = parseInt(id, 10);
-        if (isNaN(ppnCode)) {
+        // Convert id to integer since it's an auto-increment integer
+        const ppnId = parseInt(id, 10);
+        if (isNaN(ppnId)) {
             return res.status(400).json({
-                status: { code: 400, message: "Invalid PPN Setting Code" },
+                status: { code: 400, message: "Invalid PPN Setting ID" },
             });
         }
 
         // Check if the PPN Setting exists
-        const ppnSetting = await PPNSetting.findByPk(ppnCode);
+        const ppnSetting = await PPNSetting.findByPk(ppnId);
         if (!ppnSetting) {
             return res.status(404).json({
                 status: { code: 404, message: "PPN Setting not found" },
@@ -119,7 +119,7 @@ exports.updatePPNSetting = async (req, res) => {
             const existingPPNSetting = await PPNSetting.findOne({
                 where: {
                     Name,
-                    Code: { [Op.ne]: ppnCode }, // Use 'Code' instead of 'id'
+                    id: { [Op.ne]: ppnId }, // Use 'id' instead of 'Code'
                 },
             });
 
