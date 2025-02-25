@@ -53,6 +53,10 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: "Active", // Default status for new entries
             },
+            NamePIC: {
+                type: DataTypes.STRING(255), // Free text input
+                allowNull: true,
+            },
             Department: {
                 type: DataTypes.STRING(255), // Free text input
                 allowNull: true,

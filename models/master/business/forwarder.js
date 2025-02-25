@@ -24,12 +24,20 @@ module.exports = (sequelize, DataTypes) => {
                 },
                 allowNull: false,
             },
+            AddressChina: {
+                type: DataTypes.STRING(255), // Free text input
+                allowNull: true,
+            },
             AddressIndonesia: {
                 type: DataTypes.STRING(255), // Free text input
                 allowNull: true,
             },
             CoordinateIndonesia: {
                 type: DataTypes.STRING(255), // Free text input
+                allowNull: true,
+            },
+            NamePIC: {
+                type: DataTypes.STRING(100), // Free text input
                 allowNull: true,
             },
             Department: {
