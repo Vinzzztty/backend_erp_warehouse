@@ -73,8 +73,40 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             ImageURL: {
-                type: DataTypes.STRING, // or TEXT if you need longer URLs
+                type: DataTypes.TEXT, // Store multiple ImageKit URLs as a JSON string
                 allowNull: true,
+                defaultValue: "[]", // Store as an empty JSON array string
+                validate: {
+                    isValidImageArray(value) {
+                        try {
+                            const parsedValue = JSON.parse(value); // Ensure it's a valid JSON array
+                            if (!Array.isArray(parsedValue)) {
+                                throw new Error(
+                                    "ImageURL must be a valid JSON array."
+                                );
+                            }
+                            if (parsedValue.length > 8) {
+                                throw new Error(
+                                    "You can upload a maximum of 8 images."
+                                );
+                            }
+                            parsedValue.forEach((url) => {
+                                if (
+                                    typeof url !== "string" ||
+                                    !url.startsWith("https://ik.imagekit.io")
+                                ) {
+                                    throw new Error(
+                                        "Each image must be a valid ImageKit URL."
+                                    );
+                                }
+                            });
+                        } catch (error) {
+                            throw new Error(
+                                "ImageURL must be a valid JSON array stored as a string."
+                            );
+                        }
+                    },
+                },
             },
 
             Status: {

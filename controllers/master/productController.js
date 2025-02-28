@@ -10,16 +10,24 @@ const imagekit = new ImageKit({
     urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
 });
 
-// Helper function for image upload
-const uploadImageToImageKit = async (fileBuffer, fileName) => {
+// Helper function for uploading multiple images
+const uploadImagesToImageKit = async (files) => {
     try {
-        const result = await imagekit.upload({
-            file: fileBuffer,
-            fileName: fileName,
-        });
-        return result.url;
+        const imageUrls = [];
+
+        for (const file of files) {
+            const result = await imagekit.upload({
+                file: file.buffer,
+                fileName: file.originalname,
+            });
+            imageUrls.push(result.url);
+        }
+
+        return imageUrls;
     } catch (error) {
-        throw new Error("Failed to upload image to ImageKit: " + error.message);
+        throw new Error(
+            "Failed to upload images to ImageKit: " + error.message
+        );
     }
 };
 
@@ -89,18 +97,19 @@ exports.createProduct = async (req, res) => {
                 .json({ status: { code: 404, message: "Category not found" } });
         }
 
-        // Handle image upload if provided
-        let imageUrl = null;
-        let dimensions = { width: null, height: null };
-        if (req.file) {
-            imageUrl = await uploadImageToImageKit(
-                req.file.buffer,
-                req.file.originalname
-            );
+        // Handle multiple image uploads
+        let imageUrls = [];
+        if (req.files && req.files.length > 0) {
+            if (req.files.length > 8) {
+                return res.status(400).json({
+                    status: {
+                        code: 400,
+                        message: "You can upload up to 8 images only.",
+                    },
+                });
+            }
 
-            // Extract image dimensions
-            const metadata = await sharp(req.file.buffer).metadata();
-            dimensions = { width: metadata.width, height: metadata.height };
+            imageUrls = await uploadImagesToImageKit(req.files);
         }
 
         // Create the product
@@ -117,11 +126,11 @@ exports.createProduct = async (req, res) => {
             Content,
             UoM,
             Notes,
-            ImageURL: imageUrl,
+            ImageURL: JSON.stringify(imageUrls),
             Status,
-            Length: dimensions.height,
-            Width: dimensions.width,
-            Height: dimensions.height,
+            Length,
+            Width,
+            Height,
             Weight,
             Parameter,
             Keyword,
@@ -135,7 +144,10 @@ exports.createProduct = async (req, res) => {
 
         res.status(201).json({
             status: { code: 201, message: "Product created successfully" },
-            data: newProduct,
+            data: {
+                ...newProduct.toJSON(),
+                ImageURL: imageUrls, // Return as an array, not a string
+            },
         });
     } catch (error) {
         res.status(500).json({ status: { code: 500, message: error.message } });

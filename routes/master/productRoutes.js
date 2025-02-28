@@ -10,7 +10,7 @@ const upload = multer({ storage });
 // Create a new product (with image upload support)
 router.post(
     "/products",
-    upload.single("file"),
+    upload.array("images", 8),
     productController.createProduct
 );
 
