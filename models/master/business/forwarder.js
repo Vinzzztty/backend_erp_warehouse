@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
                     model: "Country", // Table name
                     key: "Code",
                 },
-                allowNull: false,
+                allowNull: true,
             },
             AddressChina: {
                 type: DataTypes.STRING(255), // Free text input

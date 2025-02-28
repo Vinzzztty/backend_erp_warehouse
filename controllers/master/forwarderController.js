@@ -104,7 +104,7 @@ exports.getAllForwarders = async (req, res) => {
 exports.getForwarderById = async (req, res) => {
     try {
         const forwarder = await Forwarder.findByPk(req.params.id, {
-            include: ["Country", "Bank"],
+            include: ["Bank"],
         });
         if (!forwarder) {
             return res.status(404).json({
