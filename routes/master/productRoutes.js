@@ -23,7 +23,7 @@ router.get("/products/:id", productController.getProductById);
 // Update a product (with image upload support)
 router.put(
     "/products/:id",
-    upload.single("file"),
+    upload.array("images", 8),
     productController.updateProduct
 );
 

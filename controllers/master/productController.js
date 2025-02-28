@@ -257,7 +257,10 @@ exports.updateProduct = async (req, res) => {
             CategoryFromChannel,
             CodeNumber,
             SKUCodeEcommerce,
+            deleteImages,
         } = req.body;
+
+        const imagesToDelete = deleteImages ? JSON.parse(deleteImages) : [];
 
         // Check if another product with the same Name exists (excluding the current one)
         if (Name) {
@@ -278,23 +281,23 @@ exports.updateProduct = async (req, res) => {
             }
         }
 
-        // Handle image upload if a new image is provided
-        let imageUrl = existingProduct.ImageURL; // Keep the existing URL if no new image is uploaded
-        let dimensions = {
-            width: existingProduct.Width,
-            height: existingProduct.Height,
-        };
+        // ✅ Handle multiple image uploads
+        let currentImageUrls = existingProduct.ImageURL
+            ? JSON.parse(existingProduct.ImageURL)
+            : [];
 
-        if (req.file) {
-            imageUrl = await uploadImageToImageKit(
-                req.file.buffer,
-                req.file.originalname
-            );
-
-            // Extract image dimensions
-            const metadata = await sharp(req.file.buffer).metadata();
-            dimensions = { width: metadata.width, height: metadata.height };
+        if (req.files && req.files.length > 0) {
+            const newImageUrls = await uploadImagesToImageKit(req.files);
+            currentImageUrls = [...currentImageUrls, ...newImageUrls];
         }
+
+        // ✅ Remove images that the user wants to delete
+        currentImageUrls = currentImageUrls.filter(
+            (url) => !imagesToDelete.includes(url)
+        );
+
+        // ✅ Convert back to JSON string for storage
+        const updatedImageURL = JSON.stringify(currentImageUrls);
 
         // Validate associations if provided
         if (CompanyCode && CompanyCode !== existingProduct.CompanyCode) {
@@ -329,7 +332,7 @@ exports.updateProduct = async (req, res) => {
             Content: Content ?? existingProduct.Content,
             UoM: UoM ?? existingProduct.UoM,
             Notes: Notes ?? existingProduct.Notes,
-            ImageURL: imageUrl,
+            ImageURL: updatedImageURL,
             Status: Status ?? existingProduct.Status,
             Length: Length ?? dimensions.height, // Auto-fill Length if not provided
             Width: Width ?? dimensions.width, // Auto-fill Width if not provided
