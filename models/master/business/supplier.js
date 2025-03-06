@@ -152,10 +152,10 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "CountryId",
             as: "Country",
         });
-        Supplier.belongsTo(models.Bank, {
-            foreignKey: "BankId",
-            as: "Bank",
-        });
+        // Supplier.belongsTo(models.Bank, {
+        //     foreignKey: "BankId",
+        //     as: "Bank",
+        // });
     };
 
     return Supplier;

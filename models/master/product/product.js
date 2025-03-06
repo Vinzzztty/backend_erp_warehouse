@@ -8,22 +8,8 @@ module.exports = (sequelize, DataTypes) => {
                 autoIncrement: true, // Enables auto_increment
                 allowNull: false,
             },
-            Name: {
-                type: DataTypes.STRING(100), // Free text input
-                allowNull: false,
-            },
-            CodeName: {
-                type: DataTypes.STRING(100), // Free text input, auto uppercase
-                allowNull: true,
-                set(value) {
-                    this.setDataValue("CodeName", value.toUpperCase());
-                },
-            },
-            SKUCode: {
-                type: DataTypes.STRING(255), // Ensure the data type matches the reference
-                unique: true, // Add a unique constraint
-                allowNull: true,
-            },
+
+            // SKUU
             SKUFull: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
@@ -32,10 +18,16 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
+            SKUCode: {
+                type: DataTypes.STRING(255), // Ensure the data type matches the reference
+                unique: true, // Add a unique constraint
+                allowNull: true,
+            },
             SKUCodeChild: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
+
             CompanyCode: {
                 type: DataTypes.INTEGER, // Foreign key from m.company
                 allowNull: false,
@@ -56,6 +48,38 @@ module.exports = (sequelize, DataTypes) => {
                 },
                 allowNull: true,
             },
+
+            SKUCodeCategory: {
+                type: DataTypes.INTEGER, // Autofilled from M.Category
+                references: {
+                    model: "Category", // Table name
+                    key: "Code",
+                },
+                allowNull: false,
+            },
+            Name: {
+                type: DataTypes.STRING(100), // Free text input
+                allowNull: false,
+            },
+            CodeName: {
+                type: DataTypes.STRING(100), // Free text input, auto uppercase
+                allowNull: true,
+                set(value) {
+                    this.setDataValue(
+                        "CodeName",
+                        value ? value.toUpperCase() : null
+                    );
+                },
+            },
+            VariantId_2: {
+                type: DataTypes.INTEGER, // Foreign key from m.variant
+                references: {
+                    model: "Variant",
+                    key: "Code",
+                },
+                allowNull: true,
+            },
+
             Content: {
                 type: DataTypes.TEXT, // Free text input
                 allowNull: true,
@@ -72,6 +96,155 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT, // Free text input (textarea)
                 allowNull: true,
             },
+
+            Status: {
+                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
+                allowNull: false,
+                defaultValue: "Active", // Default value
+            },
+
+            // Detail Product
+
+            Weight: {
+                type: DataTypes.DECIMAL(10, 2),
+                allowNull: true,
+            },
+            Length: {
+                type: DataTypes.DECIMAL(10, 2),
+                allowNull: true,
+            },
+            Width: {
+                type: DataTypes.DECIMAL(10, 2),
+                allowNull: true,
+            },
+            Height: {
+                type: DataTypes.DECIMAL(10, 2),
+                allowNull: true,
+            },
+
+            Length_UoM: {
+                type: DataTypes.STRING(10), // Foreign key from m.uom
+                references: {
+                    model: "UoM",
+                    key: "Code",
+                },
+                allowNull: true,
+            },
+            Width_UoM: {
+                type: DataTypes.STRING(10), // Foreign key from m.uom
+                references: {
+                    model: "UoM",
+                    key: "Code",
+                },
+                allowNull: true,
+            },
+            Height_UoM: {
+                type: DataTypes.STRING(10), // Foreign key from m.uom
+                references: {
+                    model: "UoM",
+                    key: "Code",
+                },
+                allowNull: true,
+            },
+            Weight_UoM: {
+                type: DataTypes.STRING(10), // Foreign key from m.uom
+                references: {
+                    model: "UoM",
+                    key: "Code",
+                },
+                allowNull: true,
+            },
+
+            Keyword: {
+                type: DataTypes.TEXT, // Store JSON array of keywords
+                allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("Keyword") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("Keyword", JSON.stringify(value));
+                },
+            },
+
+            // SKU E-Commerce List
+            StoreName: {
+                type: DataTypes.TEXT, // Store multiple store names as JSON
+                allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("StoreName") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("StoreName", JSON.stringify(value));
+                },
+            },
+            Channel: {
+                type: DataTypes.TEXT, // Store multiple channels as JSON
+                allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("Channel") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("Channel", JSON.stringify(value));
+                },
+            },
+            InitialChannel: {
+                type: DataTypes.TEXT, // Store as JSON
+                allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("InitialChannel") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue("InitialChannel", JSON.stringify(value));
+                },
+            },
+            CategoryFromChannel: {
+                type: DataTypes.TEXT, // Store as JSON
+                allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("CategoryFromChannel") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue(
+                        "CategoryFromChannel",
+                        JSON.stringify(value)
+                    );
+                },
+            },
+            CodeNumber: {
+                type: DataTypes.TEXT, // Store multiple code numbers as JSON
+                allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("CodeNumber") || "[]"
+                    ).map(Number);
+                },
+                set(value) {
+                    this.setDataValue(
+                        "CodeNumber",
+                        JSON.stringify(value.map(Number))
+                    );
+                },
+            },
+            SKUCodeEcommerce: {
+                type: DataTypes.TEXT, // Store multiple SKU codes as JSON
+                allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("SKUCodeEcommerce") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue(
+                        "SKUCodeEcommerce",
+                        JSON.stringify(value)
+                    );
+                },
+            },
+
             ImageURL: {
                 type: DataTypes.TEXT, // Store multiple ImageKit URLs as a JSON string
                 allowNull: true,
@@ -108,68 +281,6 @@ module.exports = (sequelize, DataTypes) => {
                     },
                 },
             },
-
-            Status: {
-                type: DataTypes.ENUM("Active", "Non-Active"), // Dropdown for Active/Non-active
-                allowNull: false,
-                defaultValue: "Active", // Default value
-            },
-            Length: {
-                type: DataTypes.INTEGER, // Read-only detail
-                allowNull: true,
-            },
-            Width: {
-                type: DataTypes.INTEGER, // Read-only detail
-                allowNull: true,
-            },
-            Height: {
-                type: DataTypes.INTEGER, // Read-only detail
-                allowNull: true,
-            },
-            Weight: {
-                type: DataTypes.INTEGER, // Read-only detail
-                allowNull: true,
-            },
-            Parameter: {
-                type: DataTypes.INTEGER, // Integer input
-                allowNull: true,
-            },
-            Keyword: {
-                type: DataTypes.STRING(255), // Free text input
-                allowNull: true,
-            },
-            StoreName: {
-                type: DataTypes.INTEGER, // Foreign key from m.store
-                references: {
-                    model: "Store",
-                    key: "Code",
-                },
-                allowNull: true,
-            },
-            Channel: {
-                type: DataTypes.INTEGER, // Foreign key from m.channel
-                references: {
-                    model: "Channel",
-                    key: "Code",
-                },
-                allowNull: true,
-            },
-            InitialChannel: {
-                type: DataTypes.STRING(100), // Autofill from Channel
-                allowNull: true,
-            },
-            CategoryFromChannel: {
-                type: DataTypes.STRING(100), // Autofill from Channel
-                allowNull: true,
-            },
-            CodeNumber: {
-                type: DataTypes.INTEGER, // Integer input
-                allowNull: true,
-            },
-            SKUCodeEcommerce: {
-                type: DataTypes.STRING(255), // Autogenerate based on formula
-                allowNull: true,
-            },
         },
         {
             timestamps: true,
@@ -184,14 +295,12 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     // Hooks for autofill fields
-    Product.addHook("afterCreate", async (product) => {
+    Product.addHook("beforeCreate", (product) => {
         product.SKUFull = `${product.Name}_${product.CategoryCode}_${product.CodeName}`;
         product.SKUParent = `${product.Name}_PARENT`;
         product.SKUCode = `${product.Name}_CODE`;
         product.SKUCodeChild = `${product.Name}_CHILD`;
         product.SKUCodeEcommerce = `${product.Name}_${product.Channel}_${product.InitialChannel}_${product.CategoryFromChannel}_SKU`;
-
-        await product.save();
     });
 
     // Define associations

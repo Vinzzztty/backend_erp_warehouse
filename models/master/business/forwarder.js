@@ -16,53 +16,114 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT, // Free text input (textarea)
                 allowNull: true,
             },
-            CountryId: {
-                type: DataTypes.INTEGER, // Foreign key from Country table
-                references: {
-                    model: "Country", // Table name
-                    key: "Code",
-                },
-                allowNull: true,
-            },
             AddressChina: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store as JSON
                 allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("AddressChina") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue("AddressChina", JSON.stringify(value));
+                },
             },
             AddressIndonesia: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store as JSON
                 allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("AddressIndonesia") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue(
+                        "AddressIndonesia",
+                        JSON.stringify(value)
+                    );
+                },
             },
             CoordinateIndonesia: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store as JSON
                 allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("CoordinateIndonesia") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue(
+                        "CoordinateIndonesia",
+                        JSON.stringify(value)
+                    );
+                },
             },
             NamePIC: {
-                type: DataTypes.STRING(100), // Free text input
+                type: DataTypes.TEXT, // Store as JSON
                 allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("NamePIC") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("NamePIC", JSON.stringify(value));
+                },
             },
             Department: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store as JSON
                 allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("Department") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("Department", JSON.stringify(value));
+                },
             },
             ContactMethod: {
-                type: DataTypes.ENUM("Email", "Telephone", "WA"), // Dropdown
+                type: DataTypes.TEXT, // Store as JSON (Previously ENUM)
                 allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("ContactMethod") || "[]"
+                    );
+                },
+                set(value) {
+                    this.setDataValue("ContactMethod", JSON.stringify(value));
+                },
             },
             Description: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store as JSON
                 allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("Description") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("Description", JSON.stringify(value));
+                },
             },
             BankId: {
-                type: DataTypes.INTEGER, // Foreign key from Bank table
-                references: {
-                    model: "Bank", // Table name
-                    key: "Code",
-                },
+                type: DataTypes.TEXT, // Store multiple bank IDs as JSON (no FK constraint)
                 allowNull: true,
+                get() {
+                    return JSON.parse(this.getDataValue("BankId") || "[]");
+                },
+                set(value) {
+                    this.setDataValue("BankId", JSON.stringify(value));
+                },
             },
             AccountNumber: {
-                type: DataTypes.BIGINT, // Integer input for account number
+                type: DataTypes.TEXT, // Store multiple account numbers as JSON (integer format)
                 allowNull: true,
+                get() {
+                    return JSON.parse(
+                        this.getDataValue("AccountNumber") || "[]"
+                    ).map(Number);
+                },
+                set(value) {
+                    this.setDataValue(
+                        "AccountNumber",
+                        JSON.stringify(value.map(Number))
+                    );
+                },
             },
             Website: {
                 type: DataTypes.STRING(255), // Free text input
@@ -94,10 +155,10 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: "CountryId",
             as: "Country",
         });
-        Forwarder.belongsTo(models.Bank, {
-            foreignKey: "BankId",
-            as: "Bank",
-        });
+        // Forwarder.belongsTo(models.Bank, {
+        //     foreignKey: "BankId",
+        //     as: "Bank",
+        // });
     };
 
     return Forwarder;
