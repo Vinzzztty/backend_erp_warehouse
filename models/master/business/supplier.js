@@ -54,32 +54,70 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: "Active", // Default status for new entries
             },
             NamePIC: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store JSON as a string
                 allowNull: true,
+                get() {
+                    const value = this.getDataValue("NamePIC");
+                    return value ? JSON.parse(value) : [];
+                },
+                set(value) {
+                    this.setDataValue("NamePIC", JSON.stringify(value));
+                },
             },
             Department: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store JSON as a string
                 allowNull: true,
+                get() {
+                    const value = this.getDataValue("Department");
+                    return value ? JSON.parse(value) : [];
+                },
+                set(value) {
+                    this.setDataValue("Department", JSON.stringify(value));
+                },
             },
             ContactMethod: {
-                type: DataTypes.ENUM("Email", "Telephone", "WA"), // Dropdown for contact method
+                type: DataTypes.TEXT, // Store JSON as a string (Previously ENUM)
                 allowNull: true,
+                get() {
+                    const value = this.getDataValue("ContactMethod");
+                    return value ? JSON.parse(value) : [];
+                },
+                set(value) {
+                    this.setDataValue("ContactMethod", JSON.stringify(value));
+                },
             },
             Description: {
-                type: DataTypes.STRING(255), // Free text input
+                type: DataTypes.TEXT, // Store JSON as a string
                 allowNull: true,
+                get() {
+                    const value = this.getDataValue("Description");
+                    return value ? JSON.parse(value) : [];
+                },
+                set(value) {
+                    this.setDataValue("Description", JSON.stringify(value));
+                },
             },
             BankId: {
-                type: DataTypes.INTEGER, // Foreign key from M.Bank
-                references: {
-                    model: "Bank", // Table name
-                    key: "Code",
-                },
+                type: DataTypes.TEXT, // Store JSON as a string but reference Bank model
                 allowNull: true,
+                get() {
+                    const value = this.getDataValue("BankId");
+                    return value ? JSON.parse(value) : [];
+                },
+                set(value) {
+                    this.setDataValue("BankId", JSON.stringify(value));
+                },
             },
             AccountNumber: {
-                type: DataTypes.BIGINT, // Integer for account number
+                type: DataTypes.TEXT, // Store JSON as a string
                 allowNull: true,
+                get() {
+                    const value = this.getDataValue("AccountNumber");
+                    return value ? JSON.parse(value) : [];
+                },
+                set(value) {
+                    this.setDataValue("AccountNumber", JSON.stringify(value));
+                },
             },
             Website: {
                 type: DataTypes.STRING(255), // Free text input
