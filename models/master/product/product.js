@@ -325,15 +325,15 @@ module.exports = (sequelize, DataTypes) => {
             as: "UnitOfMeasure",
         });
 
-        Product.belongsTo(models.Store, {
-            foreignKey: "StoreName",
-            as: "Store",
-        });
+        // Product.belongsTo(models.Store, {
+        //     foreignKey: "StoreName",
+        //     as: "Store",
+        // });
 
-        Product.belongsTo(models.Channel, {
-            foreignKey: "Channel",
-            as: "ChannelInfo",
-        });
+        // Product.belongsTo(models.Channel, {
+        //     foreignKey: "Channel",
+        //     as: "ChannelInfo",
+        // });
     };
 
     return Product;
