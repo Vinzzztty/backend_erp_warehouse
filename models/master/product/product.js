@@ -104,7 +104,6 @@ module.exports = (sequelize, DataTypes) => {
             },
 
             // Detail Product
-
             Weight: {
                 type: DataTypes.DECIMAL(10, 2),
                 allowNull: true,
@@ -156,93 +155,165 @@ module.exports = (sequelize, DataTypes) => {
             },
 
             Keyword: {
-                type: DataTypes.TEXT, // Store JSON array of keywords
+                type: DataTypes.TEXT,
                 allowNull: true,
                 get() {
-                    return JSON.parse(this.getDataValue("Keyword") || "[]");
+                    const value = this.getDataValue("Keyword");
+                    try {
+                        return value ? JSON.parse(value) : [];
+                    } catch (error) {
+                        console.error("Invalid JSON in Keyword:", value);
+                        return []; // ✅ Return an empty array instead of crashing
+                    }
                 },
                 set(value) {
-                    this.setDataValue("Keyword", JSON.stringify(value));
+                    this.setDataValue(
+                        "Keyword",
+                        JSON.stringify(Array.isArray(value) ? value : [])
+                    );
                 },
             },
 
             // SKU E-Commerce List
-            StoreName: {
-                type: DataTypes.TEXT, // Store multiple store names as JSON
+
+            // Store 1
+            StoreName_1: {
+                type: DataTypes.INTEGER,
+                references: { model: "Store", key: "Code" },
                 allowNull: true,
-                get() {
-                    return JSON.parse(this.getDataValue("StoreName") || "[]");
-                },
-                set(value) {
-                    this.setDataValue("StoreName", JSON.stringify(value));
-                },
             },
-            Channel: {
-                type: DataTypes.TEXT, // Store multiple channels as JSON
+            Channel_1: {
+                type: DataTypes.INTEGER,
+                references: { model: "Channel", key: "Code" },
                 allowNull: true,
-                get() {
-                    return JSON.parse(this.getDataValue("Channel") || "[]");
-                },
-                set(value) {
-                    this.setDataValue("Channel", JSON.stringify(value));
-                },
             },
-            InitialChannel: {
-                type: DataTypes.TEXT, // Store as JSON
+            InitialChannel_1: {
+                type: DataTypes.STRING(100),
                 allowNull: true,
-                get() {
-                    return JSON.parse(
-                        this.getDataValue("InitialChannel") || "[]"
-                    );
-                },
-                set(value) {
-                    this.setDataValue("InitialChannel", JSON.stringify(value));
-                },
             },
-            CategoryFromChannel: {
-                type: DataTypes.TEXT, // Store as JSON
+            CategoryFromChannel_1: {
+                type: DataTypes.STRING(100),
                 allowNull: true,
-                get() {
-                    return JSON.parse(
-                        this.getDataValue("CategoryFromChannel") || "[]"
-                    );
-                },
-                set(value) {
-                    this.setDataValue(
-                        "CategoryFromChannel",
-                        JSON.stringify(value)
-                    );
-                },
             },
-            CodeNumber: {
-                type: DataTypes.TEXT, // Store multiple code numbers as JSON
+            CodeNumber_1: {
+                type: DataTypes.INTEGER,
                 allowNull: true,
-                get() {
-                    return JSON.parse(
-                        this.getDataValue("CodeNumber") || "[]"
-                    ).map(Number);
-                },
-                set(value) {
-                    this.setDataValue(
-                        "CodeNumber",
-                        JSON.stringify(value.map(Number))
-                    );
-                },
             },
-            SKUCodeEcommerce: {
-                type: DataTypes.TEXT, // Store multiple SKU codes as JSON
+            SKUCodeEcommerce_1: {
+                type: DataTypes.STRING(255),
                 allowNull: true,
-                get() {
-                    return JSON.parse(
-                        this.getDataValue("SKUCodeEcommerce") || "[]"
-                    );
-                },
-                set(value) {
-                    this.setDataValue(
-                        "SKUCodeEcommerce",
-                        JSON.stringify(value)
-                    );
-                },
+            },
+
+            // Store 2
+            StoreName_2: {
+                type: DataTypes.INTEGER,
+                references: { model: "Store", key: "Code" },
+                allowNull: true,
+            },
+            Channel_2: {
+                type: DataTypes.INTEGER,
+                references: { model: "Channel", key: "Code" },
+                allowNull: true,
+            },
+            InitialChannel_2: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CategoryFromChannel_2: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CodeNumber_2: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            SKUCodeEcommerce_2: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
+            },
+
+            // Store 3
+            StoreName_3: {
+                type: DataTypes.INTEGER,
+                references: { model: "Store", key: "Code" },
+                allowNull: true,
+            },
+            Channel_3: {
+                type: DataTypes.INTEGER,
+                references: { model: "Channel", key: "Code" },
+                allowNull: true,
+            },
+            InitialChannel_3: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CategoryFromChannel_3: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CodeNumber_3: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            SKUCodeEcommerce_3: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
+            },
+
+            // Store 4
+            StoreName_4: {
+                type: DataTypes.INTEGER,
+                references: { model: "Store", key: "Code" },
+                allowNull: true,
+            },
+            Channel_4: {
+                type: DataTypes.INTEGER,
+                references: { model: "Channel", key: "Code" },
+                allowNull: true,
+            },
+            InitialChannel_4: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CategoryFromChannel_4: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CodeNumber_4: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            SKUCodeEcommerce_4: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
+            },
+
+            // Store 5
+            StoreName_5: {
+                type: DataTypes.INTEGER,
+                references: { model: "Store", key: "Code" },
+                allowNull: true,
+            },
+            Channel_5: {
+                type: DataTypes.INTEGER,
+                references: { model: "Channel", key: "Code" },
+                allowNull: true,
+            },
+            InitialChannel_5: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CategoryFromChannel_5: {
+                type: DataTypes.STRING(100),
+                allowNull: true,
+            },
+            CodeNumber_5: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            SKUCodeEcommerce_5: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
             },
 
             ImageURL: {
@@ -300,7 +371,24 @@ module.exports = (sequelize, DataTypes) => {
         product.SKUParent = `${product.Name}_PARENT`;
         product.SKUCode = `${product.Name}_CODE`;
         product.SKUCodeChild = `${product.Name}_CHILD`;
-        product.SKUCodeEcommerce = `${product.Name}_${product.Channel}_${product.InitialChannel}_${product.CategoryFromChannel}_SKU`;
+        // Auto-generate SKUCodeEcommerce for each store-channel combination
+        if (product.Name) {
+            product.SKUCodeEcommerce_1 = product.Channel_1
+                ? `${product.Name}_${product.Channel_1}_${product.InitialChannel_1}_${product.CategoryFromChannel_1}_SKU`
+                : null;
+            product.SKUCodeEcommerce_2 = product.Channel_2
+                ? `${product.Name}_${product.Channel_2}_${product.InitialChannel_2}_${product.CategoryFromChannel_2}_SKU`
+                : null;
+            product.SKUCodeEcommerce_3 = product.Channel_3
+                ? `${product.Name}_${product.Channel_3}_${product.InitialChannel_3}_${product.CategoryFromChannel_3}_SKU`
+                : null;
+            product.SKUCodeEcommerce_4 = product.Channel_4
+                ? `${product.Name}_${product.Channel_4}_${product.InitialChannel_4}_${product.CategoryFromChannel_4}_SKU`
+                : null;
+            product.SKUCodeEcommerce_5 = product.Channel_5
+                ? `${product.Name}_${product.Channel_5}_${product.InitialChannel_5}_${product.CategoryFromChannel_5}_SKU`
+                : null;
+        }
     });
 
     // Define associations
@@ -320,20 +408,61 @@ module.exports = (sequelize, DataTypes) => {
             as: "Variant",
         });
 
+        Product.belongsTo(models.Variant, {
+            foreignKey: "VariantId",
+            as: "Variant_2",
+        });
+
         Product.belongsTo(models.UoM, {
             foreignKey: "UoM",
             as: "UnitOfMeasure",
         });
 
-        // Product.belongsTo(models.Store, {
-        //     foreignKey: "StoreName",
-        //     as: "Store",
-        // });
+        // Associate Store & Channel for each manual SKU entry
+        Product.belongsTo(models.Store, {
+            foreignKey: "StoreName_1",
+            as: "Store1",
+        });
+        Product.belongsTo(models.Channel, {
+            foreignKey: "Channel_1",
+            as: "Channel1",
+        });
 
-        // Product.belongsTo(models.Channel, {
-        //     foreignKey: "Channel",
-        //     as: "ChannelInfo",
-        // });
+        Product.belongsTo(models.Store, {
+            foreignKey: "StoreName_2",
+            as: "Store2",
+        });
+        Product.belongsTo(models.Channel, {
+            foreignKey: "Channel_2",
+            as: "Channel2",
+        });
+
+        Product.belongsTo(models.Store, {
+            foreignKey: "StoreName_3",
+            as: "Store3",
+        });
+        Product.belongsTo(models.Channel, {
+            foreignKey: "Channel_3",
+            as: "Channel3",
+        });
+
+        Product.belongsTo(models.Store, {
+            foreignKey: "StoreName_4",
+            as: "Store4",
+        });
+        Product.belongsTo(models.Channel, {
+            foreignKey: "Channel_4",
+            as: "Channel4",
+        });
+
+        Product.belongsTo(models.Store, {
+            foreignKey: "StoreName_5",
+            as: "Store5",
+        });
+        Product.belongsTo(models.Channel, {
+            foreignKey: "Channel_5",
+            as: "Channel5",
+        });
     };
 
     return Product;
