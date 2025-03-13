@@ -83,8 +83,8 @@ exports.createProduct = async (req, res) => {
             CodeNumber_5,
         } = req.body;
 
-        console.log("Keyword Received Type:", typeof Keyword);
-        console.log("Keyword Received Value:", Keyword);
+        console.log("🚀 Received SKUCode:", SKUCode);
+        console.log("🚀 Received Name:", Name);
 
         // Check if a product with the same Name already exists
         const existingProduct = await Product.findOne({ where: { Name } });
@@ -94,13 +94,6 @@ exports.createProduct = async (req, res) => {
                     code: 400,
                     message: "Product with this name already exists",
                 },
-            });
-        }
-
-        const existingSKU = await Product.findOne({ where: { SKUCode } });
-        if (existingSKU) {
-            return res.status(400).json({
-                status: { code: 400, message: "SKUCode already exists" },
             });
         }
 
@@ -203,9 +196,9 @@ exports.createProduct = async (req, res) => {
             Name,
             CodeName,
             SKUCode,
-            SKUFull,
-            SKUParent,
-            SKUCodeChild,
+            SKUFull: `${Name}_${CategoryCode}_${CodeName}`,
+            SKUParent: `${Name}_PARENT`,
+            SKUCodeChild: `${Name}_CHILD`,
             CompanyCode,
             CategoryCode,
             SKUCodeCategory: CategoryCode,

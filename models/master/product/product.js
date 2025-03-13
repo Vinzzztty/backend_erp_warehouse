@@ -62,15 +62,17 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             CodeName: {
-                type: DataTypes.STRING(100), // Free text input, auto uppercase
+                type: DataTypes.STRING(100), // Free text input, auto-uppercase
                 allowNull: true,
                 set(value) {
-                    this.setDataValue(
-                        "CodeName",
-                        value ? value.toUpperCase() : null
-                    );
+                    if (typeof value === "string") {
+                        this.setDataValue("CodeName", value.toUpperCase());
+                    } else {
+                        this.setDataValue("CodeName", null); // Or handle non-string values safely
+                    }
                 },
             },
+
             VariantId_2: {
                 type: DataTypes.INTEGER, // Foreign key from m.variant
                 references: {
@@ -366,29 +368,31 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     // Hooks for autofill fields
-    Product.addHook("beforeCreate", (product) => {
+    Product.addHook("beforeCreate", async (product) => {
+        console.log("✅ beforeCreate Hook Running...");
+
         product.SKUFull = `${product.Name}_${product.CategoryCode}_${product.CodeName}`;
         product.SKUParent = `${product.Name}_PARENT`;
-        product.SKUCode = `${product.Name}_CODE`;
+        product.SKUCode = `${product.Name}_CODE`; // ✅ SKUCode should be generated here
         product.SKUCodeChild = `${product.Name}_CHILD`;
-        // Auto-generate SKUCodeEcommerce for each store-channel combination
-        if (product.Name) {
-            product.SKUCodeEcommerce_1 = product.Channel_1
-                ? `${product.Name}_${product.Channel_1}_${product.InitialChannel_1}_${product.CategoryFromChannel_1}_SKU`
-                : null;
-            product.SKUCodeEcommerce_2 = product.Channel_2
-                ? `${product.Name}_${product.Channel_2}_${product.InitialChannel_2}_${product.CategoryFromChannel_2}_SKU`
-                : null;
-            product.SKUCodeEcommerce_3 = product.Channel_3
-                ? `${product.Name}_${product.Channel_3}_${product.InitialChannel_3}_${product.CategoryFromChannel_3}_SKU`
-                : null;
-            product.SKUCodeEcommerce_4 = product.Channel_4
-                ? `${product.Name}_${product.Channel_4}_${product.InitialChannel_4}_${product.CategoryFromChannel_4}_SKU`
-                : null;
-            product.SKUCodeEcommerce_5 = product.Channel_5
-                ? `${product.Name}_${product.Channel_5}_${product.InitialChannel_5}_${product.CategoryFromChannel_5}_SKU`
-                : null;
-        }
+
+        console.log("✅ SKUCode Generated:", product.SKUCode); // Log generated SKUCode
+
+        product.SKUCodeEcommerce_1 = product.Channel_1
+            ? `${product.Name}_${product.Channel_1}_${product.InitialChannel_1}_${product.CategoryFromChannel_1}_SKU`
+            : null;
+        product.SKUCodeEcommerce_2 = product.Channel_2
+            ? `${product.Name}_${product.Channel_2}_${product.InitialChannel_2}_${product.CategoryFromChannel_2}_SKU`
+            : null;
+        product.SKUCodeEcommerce_3 = product.Channel_3
+            ? `${product.Name}_${product.Channel_3}_${product.InitialChannel_3}_${product.CategoryFromChannel_3}_SKU`
+            : null;
+        product.SKUCodeEcommerce_4 = product.Channel_4
+            ? `${product.Name}_${product.Channel_4}_${product.InitialChannel_4}_${product.CategoryFromChannel_4}_SKU`
+            : null;
+        product.SKUCodeEcommerce_5 = product.Channel_5
+            ? `${product.Name}_${product.Channel_5}_${product.InitialChannel_5}_${product.CategoryFromChannel_5}_SKU`
+            : null;
     });
 
     // Define associations
